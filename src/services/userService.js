@@ -11,6 +11,7 @@ async function authenticateUser(emailOrUsername, password) {
 
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     throw new Error("Invalid credentials");
+    
   }
 
   return user;
