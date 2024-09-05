@@ -1,33 +1,30 @@
 // routes/users.js
 const express = require("express");
 const router = express.Router();
-const {
-  registerUserController,
-  loginUserController,
-  sendHello,
-  sendhey,
-} = require("../controllers/userController");
+const userController = require("../controllers/user.controller");
 const {
   registerOrganizationController,
-} = require("../controllers/organizationControllers");
-const validateRegister = require("../middlewares/validations/userValidation");
+} = require("../controllers/organization.controllers");
 const checkUserExists = require("../middlewares/checkUserExists");
+const registerValidation = require("../middlewares/registerValidation");
+const tokenBlocked = require("../middlewares/tokenBlocked");
+const loginValidation = require("../middlewares/loginValidation");
 
 // GET / - prints hello world
-router.get("/api/v1/", sendHello);
+router.get("/", userController.sendHello);
 
 // GET /hey - prints hey
-router.post("/api/v1/", sendhey);
+router.post("/", userController.sendhey);
 
 // POST /signup - Create a new user
 router.post(
-  "/api/v1/signup",
-  validateRegister,
+  "/signup",
+  registerValidation(),
   checkUserExists,
-  registerUserController
+  userController.registerUserController
 );
 
-router.post("/api/v1/login", loginUserController);
+router.post("/login", loginValidation() , userController.loginUserController);
 
 //
 router.post("/api/v1/register_organization", registerOrganizationController);

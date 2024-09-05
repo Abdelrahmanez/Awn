@@ -3,9 +3,9 @@ const express = require("express");
 const router = express.Router();
 const {
   registerOrganizationController,
-} = require("../controllers/organizationControllers");
+} = require("../controllers/organization.controllers");
 
 // POST / - add a new organization
-router.post("/register_organization", registerOrganizationController);
+router.post("/register", registerOrganizationController);
 
 module.exports = router;

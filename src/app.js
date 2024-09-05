@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
+const jsend = require("jsend");
 dotenv.config({
   path: "./config.env",
 });
@@ -14,13 +15,18 @@ const app = express();
 
 // routes
 const userRoutes = require("./routes/userRoutes");
+const organizationRoutes = require("./routes/organizationRoutes");
 
 // middleware
+
+// Add JSend middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(jsend.middleware);
 
 // Mounting the routes
-app.use("/", userRoutes);
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/organization", organizationRoutes);
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));

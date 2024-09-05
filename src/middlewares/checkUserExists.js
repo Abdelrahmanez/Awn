@@ -1,32 +1,28 @@
 const User = require("../models/user");
+const asyncHandler = require("express-async-handler");
 
-const checkUserExists = async (req, res, next) => {
+const checkUserExists = asyncHandler(async (req, res, next) => {
   const { email, username, phoneNumber } = req.body;
 
-  try {
-    // Check for existing user by email, username, or phone number
-    const user = await User.findOne({
-      $or: [{ email }, { username }, { phoneNumber }],
+  const user = await User.findOne({
+    $or: [{ email }, { username }, { phoneNumber }],
+  });
+
+  if (user) {
+    const existingField =
+      user.email === email
+        ? "email"
+        : user.username === username
+        ? "username"
+        : "phoneNumber";
+
+    // Respond with a JSend fail message
+    return res.jsend.fail({
+      message: `User with this ${existingField} already exists`,
     });
-
-    if (user) {
-      // Respond with an appropriate message if user already exists
-      if (user.email === email) {
-        return res.status(400).json({ message: "Email already exists" });
-      }
-      if (user.username === username) {
-        return res.status(400).json({ message: "Username already exists" });
-      }
-      if (user.phoneNumber === phoneNumber) {
-        return res.status(400).json({ message: "Phone number already exists" });
-      }
-    }
-
-    // If user does not exist, continue to the next middleware/controller
-    next();
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
-};
+
+  next(); // Proceed to the next middleware or route handler
+});
 
 module.exports = checkUserExists;
