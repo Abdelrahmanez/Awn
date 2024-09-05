@@ -15,7 +15,7 @@ const {
   generateAccessToken,
   generateRefreshToken,
 } = require("../middlewares/jwtTokens");
-const authenticateToken = require("../middlewares/auth");
+const authenticateToken = require("../middlewares/authentication");
 const isActiveAccount = require("../middlewares/isActiveAccount");
 const asyncHandler = require("express-async-handler");
 

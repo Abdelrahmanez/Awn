@@ -9,9 +9,10 @@ const checkUserExists = require("../middlewares/checkUserExists");
 const registerValidation = require("../middlewares/registerValidation");
 const tokenBlocked = require("../middlewares/tokenBlocked");
 const loginValidation = require("../middlewares/loginValidation");
+const auth = require("../middlewares/authentication");
 
 // GET / - prints hello world
-router.get("/", userController.sendHello);
+router.get("/", auth, userController.sendHello);
 
 // GET /hey - prints hey
 router.post("/", userController.sendhey);
@@ -24,7 +25,7 @@ router.post(
   userController.registerUserController
 );
 
-router.post("/login", loginValidation() , userController.loginUserController);
+router.post("/login", loginValidation(), userController.loginUserController);
 
 //
 router.post("/api/v1/register_organization", registerOrganizationController);

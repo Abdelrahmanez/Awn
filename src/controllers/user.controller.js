@@ -50,7 +50,7 @@ const {
   generateAccessToken,
   generateRefreshToken,
 } = require("../middlewares/jwtTokens");
-const authenticateToken = require("../middlewares/auth");
+const authenticateToken = require("../middlewares/authentication");
 const isActiveAccount = require("../middlewares/isActiveAccount");
 const asyncHandler = require("express-async-handler");
 const { authenticateUser, loginUser } = require("../services/userService");
@@ -96,31 +96,29 @@ exports.loginUserController = async (req, res) => {
 
     // If the user does not exist or the password is incorrect, return an error
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-      return res.jsend.fail({ message: "Invalid email or password" });
+      return res.status(401).jsend.fail({ message: "Invalid credentials" });
     }
 
     const isActive = await isActiveAccount(user);
     if (!isActive) {
-      return res.jsend.fail({ message: "Account is not active" });
+      return res.status(403).jsend.fail({ message: "Account is not active" });
     }
 
     const accessToken = await generateAccessToken(user);
     const refreshToken = await generateRefreshToken(user);
 
-    res.jsend.success({ accessToken, refreshToken });
+    res.status(200).jsend.success({ accessToken, refreshToken });
     console.log("Logged in successfully");
   } catch (error) {
-    res.jsend.error({ message: error.message });
+    res.status(500).jsend.error({ message: error.message });
   }
 };
 
 exports.sendHello = async (req, res) => {
   try {
-    const user = await authenticateToken(req, res);
-    console.log(user);
-    return res.json({ user });
+    return res.status(200).jsend.success({ message: "Hello World" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).jsend.error({ message: error.message });
   }
 };
 
