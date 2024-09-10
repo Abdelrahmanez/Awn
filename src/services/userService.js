@@ -16,9 +16,8 @@ async function authenticateUser(emailOrUsername, password) {
   });
 
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-    r
+    return null;
   }
-
 
   return user;
 }

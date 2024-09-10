@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const userRoles = require("../utils/userRoles");
 
 const userSchema = new Schema({
   fullName: { type: String, required: true },
@@ -17,7 +18,16 @@ const userSchema = new Schema({
     match: [/^(01)[0-2,5]{1}[0-9]{8}$/, "Please fill a valid phone number"],
   },
   passwordHash: { type: String, required: true },
-  role: { type: String, enum: ["admin", "user"], default: "user" },
+  role: {
+    type: String,
+    enum: [
+      userRoles.admin,
+      userRoles.organizationAdmin,
+      userRoles.superAdmin,
+      userRoles.user,
+    ],
+    default: userRoles.user,
+  },
   address: {
     street: { type: String },
     city: { type: String },

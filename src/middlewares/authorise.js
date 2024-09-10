@@ -1,12 +1,19 @@
-const authorise = (req, res, allowedto, next) => {
-  const { role } = req.user;
-  if (role !== allowedto) {
-    return res.status(403).json({
-      status: "error",
-      error: "You are not allowed to access this resource",
-    });
-  }
-  next();
-};
+module.exports = (...roles) => {
+  console.log("Authorizing user");
 
-module.exports = authorise;
+  return (req, res, next) => {
+    // Ensure the user object is available on the request
+    if (!req.user) {
+      return res.status(401).jsend.fail({ message: "User not authenticated" });
+    }
+
+    // Check if the user's role is authorized
+    if (!roles.includes(req.user.role)) {
+      return res
+        .status(403)
+        .jsend.fail({ message: "The user is not authorized" });
+    }
+
+    next();
+  };
+};

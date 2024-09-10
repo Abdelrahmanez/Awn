@@ -2,21 +2,19 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const isActiveAccount = require("./isActiveAccount");
+const userRoles = require("../utils/userRoles");
 
 const generateAccessToken = async (user) => {
   const isActive = isActiveAccount(user);
-  console.log("isActive", isActive);
   if (!isActive) {
     throw new Error("Account is not active");
   }
 
-  console.log("generating Access Token");
-
   const newAccessToken = await jwt.sign(
-    { _id: user._id },
+    { _id: user._id, role: user.role },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: "7d",
+      expiresIn: process.env.ACCESS_TOKEN_LIFE,
     }
   );
   user.tokens = user.tokens.concat({ token: newAccessToken, blocked: false });
@@ -25,9 +23,13 @@ const generateAccessToken = async (user) => {
 };
 
 const generateRefreshToken = (user) => {
-  return jwt.sign({ _id: user._id }, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "7d",
-  });
+  return jwt.sign(
+    { _id: user._id, role: user.role },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: process.env.REFRESH_TOKEN_LIFE,
+    }
+  );
 };
 
 const verifyToken = (token) => {

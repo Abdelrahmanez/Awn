@@ -28,7 +28,7 @@ app.use(jsend.middleware);
 // Mounting the routes
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/organization", organizationRoutes);
-app.use("/api/v1/superAdmin", superAdminRoutes);
+// app.use("/api/v1/superAdmin", superAdminRoutes);
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));

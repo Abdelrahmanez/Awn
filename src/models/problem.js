@@ -1,14 +1,22 @@
+const mongoose = require("mongoose");
+const problemsType = require("../utils/problemsType");
+
 const problemSchema = new mongoose.Schema({
-  organization: {
+  organizationId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Organization",
     required: true,
   },
   title: { type: String, required: true },
   description: { type: String, maxlength: 1000 },
-  type: {
+  problemType: {
     type: String,
     enum: ["donation", "volunteering", "both"],
+    required: true,
+  },
+  problemCategory: {
+    type: [String],
+    enum: problemsType.map((problemType) => problemType.name), // Enum applies to each element of the array
     required: true,
   },
   donationDetails: {

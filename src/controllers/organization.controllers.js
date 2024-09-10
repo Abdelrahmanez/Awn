@@ -18,6 +18,8 @@ const {
 const authenticateToken = require("../middlewares/authentication");
 const isActiveAccount = require("../middlewares/isActiveAccount");
 const asyncHandler = require("express-async-handler");
+const { validationResult } = require("express-validator");
+const Problem = require("../models/problem");
 
 exports.registerOrganizationController = asyncHandler(async (req, res) => {
   const {
@@ -65,7 +67,6 @@ exports.registerOrganizationController = asyncHandler(async (req, res) => {
   return user;
 });
 
-
 exports.loginOrganizationController = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
@@ -95,4 +96,45 @@ exports.loginOrganizationController = asyncHandler(async (req, res) => {
   });
 
   return organization;
+});
+
+exports.addProblemController = asyncHandler(async (req, res) => {
+  console.log("addProblemController");
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.jsend.fail(errors.array());
+  }
+
+  const {
+    organizationId,
+    title,
+    description,
+    problemType,
+    donationDetails,
+    volunteeringDetails,
+    volunteers,
+    donations,
+    status,
+    endDate,
+  } = req.body;
+
+  const problem = await Problem.create({
+    organizationId,
+    title,
+    description,
+    problemType,
+    donationDetails,
+    volunteeringDetails,
+    volunteers,
+    donations,
+    status,
+    endDate,
+  });
+
+  res.status(201).jsend.success({
+    message: "Problem created successfully",
+    problem: problem,
+  });
+
+  return;
 });

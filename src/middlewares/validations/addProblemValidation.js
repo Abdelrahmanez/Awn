@@ -1,26 +1,27 @@
 const { body } = require("express-validator");
-const { getProblemTypes } = require("../../services/getProblemTypse");
+const problemsType = require("../../utils/problemsType");
 
-const addProblemValidation = async () => {
-  const problemTypes = await getProblemTypes();
-  console.log(problemTypes);
+const addProblemValidation = () => {
+  const problemTypesArray = problemsType.map((problemType) => problemType.name);
+  console.log(problemTypesArray);
   return [
     body("title")
       .isLength({ min: 5 })
       .withMessage("Title must be at least 5 characters long"),
     body("description")
-      .isLength({ min: 10 })
-      .withMessage("Description must be at least 10 characters long"),
-    body("problemType").isString().withMessage("Problem type must be a string"),
-    body("organizationId")
-      .isString()
-      .withMessage("Organization ID must be a string"),
+      .isLength({ min: 20 })
+      .withMessage("Description must be at least 20 characters long"),
+    body("problemType")
+      .isIn(["donation", "volunteering", "both"])
+      .withMessage(
+        "Problem type must be one of the following: donation, volunteering, both"
+      ),
+    body("problemCategory")
+      .isIn(problemTypesArray)
+      .withMessage(
+        `Category must be one of the following: ${problemTypesArray.join(", ")}`
+      ),
     body("location").isString().withMessage("Location must be a string"),
-    body("date").isDate().withMessage("Date must be a valid date"),
-    body("time").isString().withMessage("Time must be a string"),
-    body("volunteersNeeded")
-      .isInt({ min: 1 })
-      .withMessage("Volunteers needed must be at least 1"),
   ];
 };
 

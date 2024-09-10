@@ -8,7 +8,7 @@ const {
 const checkUserExists = require("../middlewares/checkUserExists");
 const registerValidation = require("../middlewares/validations/userRegisterValidation");
 const tokenBlocked = require("../middlewares/tokenBlocked");
-const loginValidation = require("../middlewares/loginValidation");
+const loginValidation = require("../middlewares/validations/loginValidation");
 const auth = require("../middlewares/authentication");
 
 // GET / - prints hello world

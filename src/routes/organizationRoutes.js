@@ -7,7 +7,10 @@ const {
 const checkOrganizationExists = require("../middlewares/checkOrganizationExists");
 const organizationConrollers = require("../controllers/organization.controllers");
 const addProblemValidation = require("../middlewares/validations/addProblemValidation");
-
+const authorise = require("../middlewares/authorise");
+const userRoles = require("../utils/userRoles");
+const authentication = require("../middlewares/authentication");
+const organizationControllers = require("../controllers/organization.controllers");
 // POST / - add a new organization
 router.post(
   "/register",
@@ -19,8 +22,10 @@ router.post("/login", organizationConrollers.loginOrganizationController);
 
 router.post(
   "/problem",
-  addProblemValidation,
-  // organizationConrollers.addProblemController
+  addProblemValidation(),
+  authentication,
+  // authorise(userRoles.organizationAdmin),
+  organizationControllers.addProblemController
 );
 
 module.exports = router;

@@ -1,8 +1,14 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const asyncHandler = require("express-async-handler");
+const { validationResult } = require("express-validator");
 
 const authenticateToken = asyncHandler(async (req, res, next) => {
+  console.log("Authenticating token");
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).jsend.fail({ errors: errors.array() });
+  }
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 

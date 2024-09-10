@@ -93,7 +93,6 @@ exports.loginUserController = asyncHandler(async (req, res) => {
   const { emailOrUsername, password } = req.body;
 
   const lowercaseEmailOrUsername = emailOrUsername.toLowerCase();
-  console.log(lowercaseEmailOrUsername);
 
   const user = await User.findOne({
     $or: [
@@ -102,7 +101,6 @@ exports.loginUserController = asyncHandler(async (req, res) => {
     ],
   });
 
-  console.log(user);
 
   if (user) {
     const passwordMatch = await bcrypt.compare(password, user.passwordHash);
