@@ -11,6 +11,8 @@ const authorise = require("../middlewares/authorise");
 const userRoles = require("../utils/userRoles");
 const authentication = require("../middlewares/authentication");
 const organizationControllers = require("../controllers/organization.controllers");
+const validOrganizationId = require("../middlewares/validOrganizationId");
+
 // POST / - add a new organization
 router.post(
   "/register",
@@ -23,6 +25,7 @@ router.post("/login", organizationConrollers.loginOrganizationController);
 router.post(
   "/problem",
   addProblemValidation(),
+  // validOrganizationId,
   authentication,
   // authorise(userRoles.organizationAdmin),
   organizationControllers.addProblemController

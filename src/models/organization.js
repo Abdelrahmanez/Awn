@@ -33,22 +33,23 @@ const OrganizationSchema = new mongoose.Schema({
         state: { type: String, required: false },
         city: { type: String, required: false },
         country: { type: String, required: true },
-        locatoionLink: { type: String, required: false },
+        locationLink: { type: String, required: false }, // Fixed typo here
       },
-      contactPhoneNumbers: {
-        type: String,
-        required: false,
-      },
+      contactPhoneNumbers: [
+        {
+          type: String,
+          required: false,
+        },
+      ], // Changed to an array of strings
     },
   ],
-  // array of phone numbers
   paymentDetails: [
     {
       method: {
         type: String,
         required: true,
       },
-      details: { type: String }, // Contains IBAN number, Instapay number, or other payment method details
+      details: { type: String, required: true }, // Added `required: true`
     },
   ],
   admins: [
@@ -78,12 +79,10 @@ const OrganizationSchema = new mongoose.Schema({
     type: Boolean,
     default: true, // Organization is active by default
   },
-  // the organization's logo
   logo: {
     type: String,
-    required: false,
+    required: false, // Organization's logo
   },
-  // the organization's social media links
   socialMedia: {
     facebook: { type: String, required: false },
     x: { type: String, required: false },
