@@ -2,24 +2,13 @@ const Organization = require("../models/organization");
 const bcrypt = require("bcryptjs");
 const hash = 10;
 const {
-  passwordValidation,
-  emailValidation,
-  phoneNumberValidation,
-  nameValidation,
-  usernameValidation,
-  authenticate,
-  userExists,
-  registerValidation,
-} = require("../middlewares/validations");
-const {
   generateAccessToken,
   generateRefreshToken,
 } = require("../middlewares/jwtTokens");
-const authenticateToken = require("../middlewares/authentication");
-const isActiveAccount = require("../middlewares/isActiveAccount");
 const asyncHandler = require("express-async-handler");
 const { validationResult } = require("express-validator");
 const Problem = require("../models/problem");
+const OrganizationAdmin = require("../models/organizationAdmin");
 
 exports.registerOrganizationController = asyncHandler(async (req, res) => {
   const {
@@ -105,8 +94,11 @@ exports.addProblemController = asyncHandler(async (req, res) => {
     return res.jsend.fail(errors.array());
   }
 
+  const organizationId = OrganizationAdmin.findOne({
+    userId: req.user._id,
+  }).organizationId;
+
   const {
-    organizationId,
     title,
     description,
     problemType,
