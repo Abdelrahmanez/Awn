@@ -47,6 +47,7 @@ const problemSchema = new mongoose.Schema({
     default: "open",
   },
   endDate: { type: Date },
+  terminated: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

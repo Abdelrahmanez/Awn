@@ -5,6 +5,7 @@ const jsend = require("jsend");
 dotenv.config({
   path: "./config.env",
 });
+const superAdminRoutes = require("./routes/superAdmin");
 // calls the database connection
 const dbConnection = require("./config/database");
 // starts the database connection
@@ -27,6 +28,7 @@ app.use(jsend.middleware);
 // Mounting the routes
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/organization", organizationRoutes);
+app.use("/api/v1/superAdmin", superAdminRoutes);
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));

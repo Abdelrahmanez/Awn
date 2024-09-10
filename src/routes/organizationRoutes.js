@@ -6,6 +6,7 @@ const {
 } = require("../controllers/organization.controllers");
 const checkOrganizationExists = require("../middlewares/checkOrganizationExists");
 const organizationConrollers = require("../controllers/organization.controllers");
+const addProblemValidation = require("../middlewares/validations/addProblemValidation");
 
 // POST / - add a new organization
 router.post(
@@ -15,5 +16,11 @@ router.post(
 );
 
 router.post("/login", organizationConrollers.loginOrganizationController);
+
+router.post(
+  "/problem",
+  addProblemValidation,
+  // organizationConrollers.addProblemController
+);
 
 module.exports = router;

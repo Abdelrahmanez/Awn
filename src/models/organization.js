@@ -46,7 +46,6 @@ const OrganizationSchema = new mongoose.Schema({
     {
       method: {
         type: String,
-        enum: ["IBAN", "Instapay", "Other"],
         required: true,
       },
       details: { type: String }, // Contains IBAN number, Instapay number, or other payment method details
