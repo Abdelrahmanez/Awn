@@ -53,7 +53,6 @@ const {
 const authenticateToken = require("../middlewares/authentication");
 const isActiveAccount = require("../middlewares/isActiveAccount");
 const asyncHandler = require("express-async-handler");
-const { authenticateUser, loginUser } = require("../services/userService");
 const { validationResult } = require("express-validator");
 
 exports.registerUserController = asyncHandler(async (req, res) => {
@@ -92,13 +91,28 @@ exports.loginUserController = asyncHandler(async (req, res) => {
     return res.jsend.fail(errors.array());
   }
   const { emailOrUsername, password } = req.body;
-  const user = await authenticateUser(emailOrUsername, password);
+
+  const lowercaseEmailOrUsername = emailOrUsername.toLowerCase();
+  console.log(lowercaseEmailOrUsername);
+
+  const user = await User.findOne({
+    $or: [
+      { email: lowercaseEmailOrUsername },
+      { username: lowercaseEmailOrUsername },
+    ],
+  });
+
   console.log(user);
+
   if (user) {
-    const accessToken = await generateAccessToken(user);
-    const refreshToken = await generateRefreshToken(user);
-    return res.jsend.success({ accessToken, refreshToken });
+    const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+    if (passwordMatch) {
+      const accessToken = await generateAccessToken(user);
+      const refreshToken = await generateRefreshToken(user);
+      return res.jsend.success({ accessToken, refreshToken });
+    }
   }
+
   return res.jsend.fail("Invalid email or password");
 });
 
