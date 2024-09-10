@@ -61,13 +61,20 @@ exports.registerUserController = asyncHandler(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.jsend.fail(errors.array());
   }
-  const { name, username, email, phoneNumber, password, passwordConfirmation } =
-    req.body;
+  const {
+    fullName,
+    username,
+    email,
+    phoneNumber,
+    password,
+    passwordConfirmation,
+  } = req.body;
+
   const hashedPassword = await bcrypt.hash(password, hash);
 
   // Create the new user
   const user = await User.create({
-    name,
+    fullName,
     // Convert the username to lowercase
     username: username.toLowerCase(),
     // Convert the email to lowercase
@@ -79,40 +86,21 @@ exports.registerUserController = asyncHandler(async (req, res) => {
   return res.jsend.success({ user });
 });
 
-exports.loginUserController = async (req, res) => {
+exports.loginUserController = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.jsend.fail(errors.array());
+  }
   const { emailOrUsername, password } = req.body;
-
-  try {
-    // convert email or username to lowercase
-    const lowerCaseEmailOrUsername = emailOrUsername.toLowerCase();
-    // Check if the email is valid if not this means the user is trying to login with a username
-    // Find the user by email or username
-    const user = await User.findOne({
-      $or: [
-        { email: lowerCaseEmailOrUsername },
-        { username: lowerCaseEmailOrUsername },
-      ],
-    });
-
-    // If the user does not exist or the password is incorrect, return an error
-    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-      return res.status(401).jsend.fail({ message: "Invalid credentials" });
-    }
-
-    const isActive = await isActiveAccount(user);
-    if (!isActive) {
-      return res.status(403).jsend.fail({ message: "Account is not active" });
-    }
-
+  const user = await authenticateUser(emailOrUsername, password);
+  console.log(user);
+  if (user) {
     const accessToken = await generateAccessToken(user);
     const refreshToken = await generateRefreshToken(user);
-
-    res.status(200).jsend.success({ accessToken, refreshToken });
-    console.log("Logged in successfully");
-  } catch (error) {
-    res.status(500).jsend.error({ message: error.message });
+    return res.jsend.success({ accessToken, refreshToken });
   }
-};
+  return res.jsend.fail("Invalid email or password");
+});
 
 exports.sendHello = async (req, res) => {
   try {

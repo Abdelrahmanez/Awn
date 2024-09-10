@@ -37,19 +37,6 @@ exports.registerOrganizationController = asyncHandler(async (req, res) => {
     passwordConfirmation,
   } = req.body;
 
-  const dataValid = await registerValidation({
-    registerType: "organization",
-    name,
-    username,
-    email,
-    phoneNumber,
-    password,
-    passwordConfirmation,
-  });
-  if (dataValid) {
-    return res.status(400).json(dataValid);
-  }
-
   const hashedPassword = await bcrypt.hash(password, hash);
 
   // Create the new user
@@ -78,21 +65,34 @@ exports.registerOrganizationController = asyncHandler(async (req, res) => {
   return user;
 });
 
-exports.addNewProblemController = asyncHandler(async (req, res) => {
-  const { title, description, category, location, media } = req.body;
 
-  const problem = await Problem.create({
-    title,
-    description,
-    category,
-    location,
-    media,
-    organization: req.user._id,
+exports.loginOrganizationController = asyncHandler(async (req, res) => {
+  const { username, password } = req.body;
+
+  const organization = await Organization.findOne({
+    username: username.toLowerCase(),
   });
-  problem.save();
-  res.status(201).json({
-    message: "problem created successfully",
-    problem: problem,
+
+  if (!organization) {
+    res.status(400).jsend.fail("Organization does not exist");
+  }
+
+  const validPassword = await bcrypt.compare(
+    password,
+    organization.passwordHash
+  );
+
+  if (!validPassword) {
+    res.status(400).jsend.fail("Invalid password");
+  }
+
+  const accessToken = generateAccessToken(organization);
+  const refreshToken = generateRefreshToken(organization);
+
+  res.status(200).jsend.success({
+    accessToken: accessToken,
+    refreshToken: refreshToken,
   });
-  return problem;
+
+  return organization;
 });

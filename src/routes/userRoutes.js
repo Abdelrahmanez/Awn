@@ -6,7 +6,7 @@ const {
   registerOrganizationController,
 } = require("../controllers/organization.controllers");
 const checkUserExists = require("../middlewares/checkUserExists");
-const registerValidation = require("../middlewares/registerValidation");
+const registerValidation = require("../middlewares/validations/userRegisterValidation");
 const tokenBlocked = require("../middlewares/tokenBlocked");
 const loginValidation = require("../middlewares/loginValidation");
 const auth = require("../middlewares/authentication");
@@ -27,7 +27,5 @@ router.post(
 
 router.post("/login", loginValidation(), userController.loginUserController);
 
-//
-router.post("/api/v1/register_organization", registerOrganizationController);
 
 module.exports = router;

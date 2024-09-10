@@ -4,8 +4,8 @@ const registerValidation = () => {
   return [
     body("fullName")
       .isLength({ min: 5 })
-      .matches(/^[a-zA-Z ]*$/)
-      .withMessage("Name must be at least 3 characters long"),
+      .matches(/^[a-zA-Z]+ [a-zA-Z]+$/)
+      .withMessage("please enter your first and last name"),
     body("username")
       .isLength({ min: 3 })
       .matches(/^[a-zA-Z0-9_]*$/)

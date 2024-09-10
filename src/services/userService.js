@@ -1,17 +1,22 @@
 // services/userService.js
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
-const { generateAccessToken, generateRefreshToken } = require("../middlewares/jwtTokens");
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../middlewares/jwtTokens");
 
 async function authenticateUser(emailOrUsername, password) {
   const lowerCaseEmailOrUsername = emailOrUsername.toLowerCase();
   const user = await User.findOne({
-    $or: [{ email: lowerCaseEmailOrUsername }, { username: lowerCaseEmailOrUsername }]
+    $or: [
+      { email: lowerCaseEmailOrUsername },
+      { username: lowerCaseEmailOrUsername },
+    ],
   });
 
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     throw new Error("Invalid credentials");
-    
   }
 
   return user;
