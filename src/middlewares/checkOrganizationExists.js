@@ -1,4 +1,4 @@
-const Organization = require("../models/organization");
+const Organization = require("../models/Organization");
 const asyncHandler = require("express-async-handler");
 
 const checkOrganizationExists = asyncHandler(async (req, res, next) => {

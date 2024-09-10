@@ -1,4 +1,4 @@
-const Organization = require("../models/organization");
+const Organization = require("../models/Organization");
 const bcrypt = require("bcryptjs");
 const hash = 10;
 const {
@@ -94,9 +94,15 @@ exports.addProblemController = asyncHandler(async (req, res) => {
     return res.jsend.fail(errors.array());
   }
 
-  const organizationId = OrganizationAdmin.findOne({
-    userId: req.user._id,
-  }).organizationId;
+  const organizationAdmin = await OrganizationAdmin.findOne({
+    userId: req.user.id,
+  });
+
+  if (!organizationAdmin) {
+    return res.status(404).jsend.fail({ message: "Organization admin not found" });
+  }
+
+  const organizationId = organizationAdmin.organizationId;
 
   const {
     title,
@@ -110,18 +116,30 @@ exports.addProblemController = asyncHandler(async (req, res) => {
     endDate,
   } = req.body;
 
-  const problem = await Problem.create({
+  // Prepare the problem data based on the problemType
+  const problemData = {
     organizationId,
     title,
     description,
     problemType,
-    donationDetails,
-    volunteeringDetails,
     volunteers,
     donations,
     status,
     endDate,
-  });
+  };
+
+  // Attach donationDetails if the problemType is "donation" or "both"
+  if (problemType === "donation" || problemType === "both") {
+    problemData.donationDetails = donationDetails;
+  }
+
+  // Attach volunteeringDetails if the problemType is "volunteering" or "both"
+  if (problemType === "volunteering" || problemType === "both") {
+    problemData.volunteeringDetails = volunteeringDetails;
+  }
+
+  // Create the problem with the appropriate details
+  const problem = await Problem.create(problemData);
 
   res.status(201).jsend.success({
     message: "Problem created successfully",
