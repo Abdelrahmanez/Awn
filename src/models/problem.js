@@ -1,26 +1,54 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-
-const problemSchema = new Schema({
+const problemSchema = new mongoose.Schema({
+  organization: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Organization",
+    required: true,
+  },
   title: { type: String, required: true },
-  description: { type: String, required: true },
-  Image: { type: String, required: true },
-  category: { type: String, required: true },
-  location: { type: String, required: true },
-  volunteering: { type: Boolean, required: true },
-  donation: { type: Boolean, required: true },
-  maxVolunteers: { type: Number, required: true },
-  donationGoal: { type: Number, required: true },
-  currentDonation: { type: Number, required: true },
-  currentVolunteers: { type: Number, required: true },
-  date: { type: Date, required: true },
-  organization: { type: Schema.Types.ObjectId, ref: "Organization" },
-  volunteers: [{ type: Schema.Types.ObjectId, ref: "User" }],
-  volunteersCount: { type: Number, required: true },
-  donations: [{ type: Schema.Types.ObjectId, ref: "Donation" }],
-  likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
-  likesCount: { type: Number, required: true },
+  description: { type: String, maxlength: 1000 },
+  type: {
+    type: String,
+    enum: ["donation", "volunteering", "both"],
+    required: true,
+  },
+  donationDetails: {
+    isFixedPrice: { type: Boolean, default: false },
+    prices: [{ label: String, amount: Number }],
+  },
+  volunteeringDetails: {
+    location: {
+      street: { type: String },
+      city: { type: String },
+      state: { type: String },
+      country: { type: String },
+      locationLink: { type: String },
+    },
+    requiredSkills: [{ type: String }],
+    availableDates: [
+      {
+        date: { type: Date },
+        startTime: { type: Date },
+        endTime: { type: Date },
+      },
+    ],
+  },
+  volunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  donations: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      amount: { type: Number, required: true },
+      method: { type: String, enum: ["IBAN", "Instapay"], required: true },
+      date: { type: Date, default: Date.now },
+    },
+  ],
+  status: {
+    type: String,
+    enum: ["open", "closed", "in_progress"],
+    default: "open",
+  },
+  endDate: { type: Date },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
-const Problem = mongoose.model("Problem", problemSchema);
-module.exports = Problem;
+module.exports = mongoose.model("Problem", problemSchema);

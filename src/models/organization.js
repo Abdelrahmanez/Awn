@@ -13,22 +13,56 @@ const OrganizationSchema = new mongoose.Schema({
     type: String,
     required: false, // Optional slogan of the organization
   },
-
-  address: {
-    street: { type: String, required: false },
-    city: { type: String, required: false },
-    country: { type: String, required: true },
-    locatoionLink: { type: String, required: false },
-  },
+  contactPhoneNumbers: [
+    {
+      type: String,
+      required: false, // Optional phone numbers
+    },
+  ],
+  contactEmails: [
+    {
+      type: String,
+      required: false, // Optional email addresses
+    },
+  ],
+  branches: [
+    {
+      name: { type: String, required: true },
+      address: {
+        street: { type: String, required: false },
+        state: { type: String, required: false },
+        city: { type: String, required: false },
+        country: { type: String, required: true },
+        locatoionLink: { type: String, required: false },
+      },
+      contactPhoneNumbers: {
+        type: String,
+        required: false,
+      },
+    },
+  ],
   // array of phone numbers
-  phoneNumber: {
-    type: String,
-    required: true, // At least one phone number is required
-  },
-  email: {
-    type: String,
-    required: true, // Optional email address
-  },
+  paymentDetails: [
+    {
+      method: {
+        type: String,
+        enum: ["IBAN", "Instapay", "Other"],
+        required: true,
+      },
+      details: { type: String }, // Contains IBAN number, Instapay number, or other payment method details
+    },
+  ],
+  admins: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      role: {
+        type: String,
+        enum: ["manage_volunteers", "post_problems", "manage_roles"],
+        required: true,
+      },
+    },
+  ],
+  problems: [{ type: mongoose.Schema.Types.ObjectId, ref: "Problem" }],
   website: {
     type: String,
     required: false, // Optional website URL
@@ -45,11 +79,6 @@ const OrganizationSchema = new mongoose.Schema({
     type: Boolean,
     default: true, // Organization is active by default
   },
-  // the policies of the organization
-  policies: {
-    termsAndConditions: { type: String, required: false },
-    privacyPolicy: { type: String, required: false },
-  },
   // the organization's logo
   logo: {
     type: String,
@@ -61,11 +90,6 @@ const OrganizationSchema = new mongoose.Schema({
     x: { type: String, required: false },
     linkedIn: { type: String, required: false },
     instagram: { type: String, required: false },
-  },
-  // the organization's mission statement
-  mission: {
-    type: String,
-    required: false,
   },
 });
 

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  name: { type: String, required: true },
+  fullName: { type: String, required: true },
   username: { type: String, required: true, unique: true },
   email: {
     type: String,
@@ -17,17 +17,40 @@ const userSchema = new Schema({
     match: [/^(01)[0-2,5]{1}[0-9]{8}$/, "Please fill a valid phone number"],
   },
   passwordHash: { type: String, required: true },
-  role: { type: String, enum: ["user", "organization_rep"], default: "user" },
-  location: {
-    city: String,
-    state: String,
-    country: String,
+  role: { type: String, enum: ["admin", "user"], default: "user" },
+  address: {
+    street: { type: String },
+    city: { type: String },
+    state: { type: String },
+    country: { type: String },
   },
   age: { type: Number, min: 5, max: 100 },
   skills: [String],
-  volunteeringScore: { type: Number, default: 0, min: 0, max: 100 },
-  volunteeringHistory: [{ type: Schema.Types.ObjectId, ref: "Volunteer" }],
-  donationHistory: [{ type: Schema.Types.ObjectId, ref: "Donation" }],
+  points: { type: Number, default: 0 },
+  isScorePrivate: { type: Boolean, default: false },
+  volunteeringHistory: [
+    {
+      problemId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Problem",
+        required: true,
+      },
+      feedback: { type: String }, // Optional: Feedback provided by the user
+    },
+  ],
+
+  donationHistory: [
+    {
+      problemId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Problem",
+        required: true,
+      },
+      amount: { type: Number, required: true },
+      date: { type: Date, default: Date.now },
+      proofImage: { type: String }, // Optional: Image of the receipt
+    },
+  ],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   tokens: [{ token: String, blocked: { type: Boolean, default: false } }],
