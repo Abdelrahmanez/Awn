@@ -13,6 +13,8 @@ const authentication = require("../middlewares/authentication");
 const organizationControllers = require("../controllers/organization.controllers");
 const validOrganizationId = require("../middlewares/validOrganizationId");
 const OrganizationAdmin = require("../models/organizationAdmin");
+const User = require("../models/user");
+
 
 // POST / - add a new organization
 router.post(
@@ -27,20 +29,35 @@ router.post(
   "/problem",
   addProblemValidation(),
   authentication,
-  // authorise(userRoles.organizationAdmin),
+  authorise(userRoles.post_problems , userRoles.organizationAdmin),
   organizationControllers.addProblemController
 );
 
-router.post("/add-admin", (req, res) => {
+router.post("/add-admin", async (req, res) => {
   try {
     const { userId, organizationId, role } = req.body;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).jsend.fail({ message: "User not found" });
+    }
+
+    // Create a new OrganizationAdmin document
     const admin = new OrganizationAdmin({
       userId,
       organizationId,
       role,
     });
-    admin.save();
-    res.status(201).jsend.success(admin);
+
+    await admin.save(); // Save the new OrganizationAdmin document
+
+    // Update the user role
+    user.role = role; // Assuming `role` is a field on the User model
+    await user.save();
+
+    res.status(201).jsend.success({ admin, user });
   } catch (error) {
     res.status(500).jsend.error({ message: error.message });
   }

@@ -24,6 +24,11 @@ const problemsTypes = [
     name: "Environment",
     description: "Environment problems",
   },
+  {
+    id: 6,
+    name: "Food",
+    description: "Food problems",
+  },
 ];
 
 module.exports = problemsTypes;

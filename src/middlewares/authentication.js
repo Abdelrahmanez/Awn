@@ -41,6 +41,7 @@ const authenticateToken = asyncHandler(async (req, res, next) => {
     }
 
     // Attach user info to the request
+    console.log("User authenticated");
     req.user = user;
     next();
   } catch (err) {

@@ -25,6 +25,7 @@ const userSchema = new Schema({
       userRoles.organizationAdmin,
       userRoles.superAdmin,
       userRoles.user,
+      userRoles.post_problems,
     ],
     default: userRoles.user,
   },

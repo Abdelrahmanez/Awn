@@ -99,7 +99,9 @@ exports.addProblemController = asyncHandler(async (req, res) => {
   });
 
   if (!organizationAdmin) {
-    return res.status(404).jsend.fail({ message: "Organization admin not found" });
+    return res
+      .status(404)
+      .jsend.fail({ message: "The user is not Admin at any Organization" });
   }
 
   const organizationId = organizationAdmin.organizationId;
@@ -108,11 +110,10 @@ exports.addProblemController = asyncHandler(async (req, res) => {
     title,
     description,
     problemType,
+    problemCategory,
     donationDetails,
     volunteeringDetails,
-    volunteers,
-    donations,
-    status,
+    availableDates,
     endDate,
   } = req.body;
 
@@ -122,11 +123,11 @@ exports.addProblemController = asyncHandler(async (req, res) => {
     title,
     description,
     problemType,
-    volunteers,
-    donations,
-    status,
+    problemCategory,
+    availableDates,
     endDate,
   };
+
 
   // Attach donationDetails if the problemType is "donation" or "both"
   if (problemType === "donation" || problemType === "both") {

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const problemsType = require("../utils/problemsType");
+const { required } = require("joi");
 
 const problemSchema = new mongoose.Schema({
   organizationId: {
@@ -20,7 +21,7 @@ const problemSchema = new mongoose.Schema({
     required: true,
   },
   donationDetails: {
-    isFixedPrice: { type: Boolean, default: false },
+    // isFixedPrice: { type: Boolean, default: false },
     prices: [{ label: String, amount: Number }],
   },
   volunteeringDetails: {
@@ -31,7 +32,12 @@ const problemSchema = new mongoose.Schema({
       country: { type: String },
       locationLink: { type: String },
     },
-    requiredSkills: [{ type: String }],
+    requiredSkills: [
+      {
+        type: { type: String, required: true },  // Nested object with 'type' field
+        volunteersNeeded: { type: Number, default: 1 }
+      }
+    ],
     availableDates: [
       {
         date: { type: Date },
