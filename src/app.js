@@ -30,6 +30,11 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/organization", organizationRoutes);
 // app.use("/api/v1/superAdmin", superAdminRoutes);
 
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger-output.json");
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
   console.log("mode : ", process.env.NODE_ENV);
