@@ -46,15 +46,15 @@ const problemSchema = new mongoose.Schema({
       },
     ],
   },
-  volunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  donations: [
-    {
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      amount: { type: Number, required: true },
-      method: { type: String, enum: ["IBAN", "Instapay"], required: true },
-      date: { type: Date, default: Date.now },
-    },
-  ],
+  // volunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  // donations: [
+  //   {
+  //     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  //     amount: { type: Number, required: true },
+  //     method: { type: String, enum: ["IBAN", "Instapay"], required: true },
+  //     date: { type: Date, default: Date.now },
+  //   },
+  // ],
   status: {
     type: String,
     enum: ["open", "closed", "in_progress"],

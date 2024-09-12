@@ -39,16 +39,16 @@ const userSchema = new Schema({
   skills: [String],
   points: { type: Number, default: 0 },
   isScorePrivate: { type: Boolean, default: false },
-  volunteeringHistory: [
-    {
-      problemId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Problem",
-        required: true,
-      },
-      feedback: { type: String }, // Optional: Feedback provided by the user
-    },
-  ],
+  // volunteeringHistory: [
+  //   {
+  //     problemId: {
+  //       type: mongoose.Schema.Types.ObjectId,
+  //       ref: "Problem",
+  //       required: true,
+  //     },
+  //     feedback: { type: String }, // Optional: Feedback provided by the user
+  //   },
+  // ],
 
   donationHistory: [
     {

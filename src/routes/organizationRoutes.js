@@ -14,7 +14,7 @@ const organizationControllers = require("../controllers/organization.controllers
 const validOrganizationId = require("../middlewares/validOrganizationId");
 const OrganizationAdmin = require("../models/organizationAdmin");
 const User = require("../models/user");
-
+const updateProblemValidation = require("../middlewares/validations/updateProblemValidation");
 
 // POST / - add a new organization
 router.post(
@@ -29,8 +29,16 @@ router.post(
   "/problem",
   addProblemValidation(),
   authentication,
-  authorise(userRoles.post_problems , userRoles.organizationAdmin),
+  authorise(userRoles.post_problems, userRoles.organizationAdmin),
   organizationControllers.addProblemController
+);
+
+router.patch(
+  "/problem/:id",
+  updateProblemValidation(),
+  authentication,
+  authorise(userRoles.post_problems, userRoles.organizationAdmin)
+  // organizationControllers.updateProblemController
 );
 
 router.post("/add-admin", async (req, res) => {

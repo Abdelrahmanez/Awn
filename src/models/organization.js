@@ -52,16 +52,16 @@ const OrganizationSchema = new mongoose.Schema({
       details: { type: String, required: true }, // Added `required: true`
     },
   ],
-  admins: [
-    {
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      role: {
-        type: String,
-        enum: ["manage_volunteers", "post_problems", "manage_roles"],
-        required: true,
-      },
-    },
-  ],
+  // admins: [
+  //   {
+  //     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  //     role: {
+  //       type: String,
+  //       enum: ["manage_volunteers", "post_problems", "manage_roles"],
+  //       required: true,
+  //     },
+  //   },
+  // ],
   problems: [{ type: mongoose.Schema.Types.ObjectId, ref: "Problem" }],
   website: {
     type: String,
@@ -74,7 +74,7 @@ const OrganizationSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now, // Automatically set to the current date
-  },
+  },  
   isActive: {
     type: Boolean,
     default: true, // Organization is active by default

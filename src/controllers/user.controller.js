@@ -54,6 +54,7 @@ const authenticateToken = require("../middlewares/authentication");
 const isActiveAccount = require("../middlewares/isActiveAccount");
 const asyncHandler = require("express-async-handler");
 const { validationResult } = require("express-validator");
+const Volunteerings = require("../models/volunteerings");
 
 exports.registerUserController = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -101,7 +102,6 @@ exports.loginUserController = asyncHandler(async (req, res) => {
     ],
   });
 
-
   if (user) {
     const passwordMatch = await bcrypt.compare(password, user.passwordHash);
     if (passwordMatch) {
@@ -114,9 +114,36 @@ exports.loginUserController = asyncHandler(async (req, res) => {
   return res.jsend.fail("Invalid email or password");
 });
 
+exports.volunteerController = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.jsend.fail(errors.array());
+  }
+  const { problemId } = req.params;
+  const { joinedDays } = req.body;
+  const userId = req.user._id;
+
+  // Create the new user
+  const volunteer = await Volunteerings.create({
+    problemId,
+    userId,
+    joinedDays,
+  });
+  volunteer.save();
+  return res.jsend.success({ volunteer });
+});
+
 exports.sendHello = async (req, res) => {
   try {
     return res.status(200).jsend.success({ message: "Hello World" });
+  } catch (error) {
+    res.status(500).jsend.error({ message: error.message });
+  }
+};
+
+exports.getProfile = async (req, res) => {
+  try {
+    return res.status(200).jsend.success({ user: req.user });
   } catch (error) {
     res.status(500).jsend.error({ message: error.message });
   }

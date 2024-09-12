@@ -25,7 +25,7 @@ exports.registerOrganizationController = asyncHandler(async (req, res) => {
     email,
     phoneNumber,
     password,
-    passwordConfirmation,
+    
   } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, hash);
