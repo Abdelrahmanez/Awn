@@ -22,38 +22,51 @@ const addProblemValidation = () => {
     // Problem Type Validation
     body("problemType")
       .isIn(["donation", "volunteering", "both"])
-      .withMessage("Problem type must be one of the following: donation, volunteering, both"),
+      .withMessage(
+        "Problem type must be one of the following: donation, volunteering, both"
+      ),
 
     // Problem Category Validation
     body("problemCategory")
       .isArray()
       .withMessage("Problem category must be an array")
       .custom((value) => value.every((v) => problemTypesArray.includes(v)))
-      .withMessage(`Category must be one of the following: ${problemTypesArray.join(", ")}`),
+      .withMessage(
+        `Category must be one of the following: ${problemTypesArray.join(", ")}`
+      ),
 
     // Donation Details Validation
     body("donationDetails.prices")
       .optional()
       .isArray()
       .withMessage("Prices must be an array"),
-    body("donationDetails.prices.*")
-      .custom((price) => {
-        if (!price || typeof price !== "object") {
-          throw new Error("Each price must be an object with 'label' and 'amount' properties.");
-        }
+    body("donationDetails.prices.*").custom((price) => {
+      if (!price || typeof price !== "object") {
+        throw new Error(
+          "Each price must be an object with 'label' and 'amount' properties."
+        );
+      }
 
-        // Check that 'label' exists and is a non-empty string
-        if (!price.label || typeof price.label !== "string" || price.label.trim() === "") {
-          throw new Error("Each price object must have a non-empty 'label' of type string.");
-        }
+      // Check that 'label' exists and is a non-empty string
+      if (
+        !price.label ||
+        typeof price.label !== "string" ||
+        price.label.trim() === ""
+      ) {
+        throw new Error(
+          "Each price object must have a non-empty 'label' of type string."
+        );
+      }
 
-        // Check that 'amount' exists and is a number
-        if (typeof price.amount !== "number" || isNaN(price.amount)) {
-          throw new Error("Each price object must have an 'amount' of type number.");
-        }
+      // Check that 'amount' exists and is a number
+      if (typeof price.amount !== "number" || isNaN(price.amount)) {
+        throw new Error(
+          "Each price object must have an 'amount' of type number."
+        );
+      }
 
-        return true;
-      }),
+      return true;
+    }),
 
     // Volunteering Details Location Validation
     body("volunteeringDetails.location.street")
@@ -88,6 +101,9 @@ const addProblemValidation = () => {
     body("volunteeringDetails.requiredSkills.*.volunteersNeeded")
       .isInt({ min: 1 })
       .withMessage("Volunteers needed must be a positive integer"),
+    body("volunteeringDetails.branches.*")
+      .isMongoId()
+      .withMessage("Branch ID must be a valid MongoDB ID"),
 
     // Available Dates Validation
     body("volunteeringDetails.availableDates")
@@ -106,13 +122,12 @@ const addProblemValidation = () => {
       .optional()
       .isISO8601()
       .withMessage("End time must be a valid ISO 8601 date-time"),
-    body("volunteeringDetails.availableDates.*")
-      .custom((dateObj) => {
-        if (new Date(dateObj.startTime) >= new Date(dateObj.endTime)) {
-          throw new Error("Start time must be before end time");
-        }
-        return true;
-      }),
+    body("volunteeringDetails.availableDates.*").custom((dateObj) => {
+      if (new Date(dateObj.startTime) >= new Date(dateObj.endTime)) {
+        throw new Error("Start time must be before end time");
+      }
+      return true;
+    }),
 
     // End Date Validation
     body("endDate")

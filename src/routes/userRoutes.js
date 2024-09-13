@@ -49,6 +49,13 @@ router
     userController.updateUserController
   );
 
+router.get(
+  "/volunteeringHistory",
+  authentication,
+  authorise(userRoles.user),
+  userController.getVolunteeringHistory
+);
+
 router.post(
   "/problem/:problemId/volunteer",
   volnuteerValidation(),

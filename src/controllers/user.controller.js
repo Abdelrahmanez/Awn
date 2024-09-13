@@ -55,6 +55,9 @@ const isActiveAccount = require("../middlewares/isActiveAccount");
 const asyncHandler = require("express-async-handler");
 const { validationResult } = require("express-validator");
 const Volunteerings = require("../models/volunteerings");
+const mongoose = require("mongoose");
+const { organization } = require("../utils/userRoles");
+const problem = require("../models/problem");
 
 exports.registerUserController = asyncHandler(async (req, res) => {
   const {
@@ -199,6 +202,59 @@ exports.updateUserController = asyncHandler(async (req, res) => {
 
   // Return success response
   return res.jsend.success({ user });
+});
+
+exports.getVolunteeringHistory = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  // Aggregation pipeline
+  const volunteerings = await Volunteerings.aggregate([
+    // Match documents with the given userId
+    { $match: { userId: userId } }, // Ensure userId is properly matched
+
+    // Lookup to join with the Problem collection
+    {
+      $lookup: {
+        from: "problems", // The collection name for the Problem model
+        localField: "problemId", // Field in Volunteerings schema
+        foreignField: "_id", // Field in Problem schema
+        as: "problemDetails", // Field name to store the joined document
+      },
+    },
+
+    // Unwind the problemDetails array to get a single document
+    { $unwind: { path: "$problemDetails", preserveNullAndEmptyArrays: true } },
+
+    // Optionally, project fields to include only necessary ones
+    {
+      $project: {
+        _id: 1,
+        userId: 1,
+        problemId: 1,
+        branchId: 1,
+        joinedDays: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        updatedBy: 1,
+        // Include problem details from the lookup
+        problemDetails: {
+          _id: "$problemDetails._id",
+          organizationId: "$problemDetails.organizationId",
+          title: "$problemDetails.title",
+          description: "$problemDetails.description",
+          problemType: "$problemDetails.problemType",
+          problemCategory: "$problemDetails.problemCategory",
+          donationDetails: "$problemDetails.donationDetails",
+          volunteeringDetails: "$problemDetails.volunteeringDetails",
+          status: "$problemDetails.status",
+          endDate: "$problemDetails.endDate",
+          terminated: "$problemDetails.terminated",
+        },
+      },
+    },
+  ]);
+
+  return res.jsend.success({ volunteerings });
 });
 
 exports.sendhey = (req, res) => {

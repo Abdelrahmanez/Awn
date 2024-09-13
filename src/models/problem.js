@@ -29,7 +29,7 @@ const problemSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Branch", // Correctly references the Branch model
         required: true,
-      }
+      },
     ],
     activities: [
       {

@@ -17,9 +17,8 @@ const User = require("../models/user");
 const updateProblemValidation = require("../middlewares/validations/updateProblemValidation");
 const organizationRegistrationValidation = require("../middlewares/validations/organizationRegisterValidation");
 const loginValidation = require("../middlewares/validations/loginValidation");
-const organizationAuthentication = require("../middlewares/OrganizationMiddlewares/OrganizationAuthentication");
-const validation = require("../middlewares/validations/validationResult");
 const addBranchValidation = require("../middlewares/validations/addBranchValidation");
+const validation = require("../middlewares/validations/validationResult");
 // POST / - add a new organization
 router.post(
   "/register",
@@ -37,8 +36,9 @@ router.post(
 router.post(
   "/problem",
   addProblemValidation(),
+  validation,
   authentication,
-  authorise(userRoles.post_problems, userRoles.organizationAdmin),
+  authorise(userRoles.post_problems, userRoles.organizationAdmin , userRoles.organization),
   organizationControllers.addProblemController
 );
 

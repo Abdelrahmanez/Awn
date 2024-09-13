@@ -8,10 +8,6 @@ const Organization = require("../models/Organization");
 
 const authenticateToken = asyncHandler(async (req, res, next) => {
   console.log("Authenticating token");
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).jsend.fail({ errors: errors.array() });
-  }
 
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -34,6 +30,10 @@ const authenticateToken = asyncHandler(async (req, res, next) => {
       console.log("Fetching Organization");
       user = await Organization.findOne({ _id: decoded._id });
       user.organizationId = user._id;
+    } else {
+      return res
+        .status(403)
+        .jsend.fail({ message: "The user is not authorized" });
     }
 
     if (!user) {
@@ -53,8 +53,8 @@ const authenticateToken = asyncHandler(async (req, res, next) => {
     if (user.isActive === false) {
       return res.status(400).jsend.fail({ message: "User is not active" });
     }
-
     if (userType === userRoles.admin) {
+      console.log("Admin User");
       const organizationAdmin = await OrganizationAdmin.findOne({
         userId: decoded._id,
       });

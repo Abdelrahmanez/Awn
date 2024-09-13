@@ -93,23 +93,7 @@ exports.loginOrganizationController = asyncHandler(async (req, res) => {
 });
 
 exports.addProblemController = asyncHandler(async (req, res) => {
-  console.log("addProblemController");
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.jsend.fail(errors.array());
-  }
-
-  const organizationAdmin = await OrganizationAdmin.findOne({
-    userId: req.user.id,
-  });
-
-  if (!organizationAdmin) {
-    return res
-      .status(404)
-      .jsend.fail({ message: "The user is not Admin at any Organization" });
-  }
-
-  const organizationId = organizationAdmin.organizationId;
+  const organizationId = req.user.organizationId;
 
   const {
     title,
@@ -165,7 +149,7 @@ exports.addBranchController = asyncHandler(async (req, res) => {
     name,
     address,
     location,
-    contactPhoneNumbers
+    contactPhoneNumbers,
   });
 
   res.status(201).jsend.success({

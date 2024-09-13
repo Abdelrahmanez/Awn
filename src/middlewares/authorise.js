@@ -6,7 +6,7 @@ module.exports = (...roles) => {
       return res.status(401).jsend.fail({ message: "User not authenticated" });
     }
 
-    if (req.user.role === "admin") {
+    if (req.user.role === "admin" ) {
       const permissions = req.user.permissions;
 
       // Check if any of the roles are included in the permissions array
