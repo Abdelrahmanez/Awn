@@ -1,7 +1,6 @@
 const organizationAdmin = require("../models/organizationAdmin");
 
 module.exports = (...roles) => {
-  console.log("Authorizing user");
 
   return async (req, res, next) => {
     if (!req.user) {
