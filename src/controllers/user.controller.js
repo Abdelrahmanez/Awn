@@ -57,7 +57,7 @@ const { validationResult } = require("express-validator");
 const Volunteerings = require("../models/volunteerings");
 const mongoose = require("mongoose");
 const { organization } = require("../utils/userRoles");
-const problem = require("../models/problem");
+const Problem = require("../models/problem");
 
 exports.registerUserController = asyncHandler(async (req, res) => {
   const {
@@ -117,6 +117,21 @@ exports.volunteerController = asyncHandler(async (req, res) => {
   const { problemId } = req.params;
   const { joinedDays, branchId } = req.body;
   const userId = req.user._id;
+
+  const problem = await Problem.findById(problemId);
+  if (!problem) {
+    return res.status(404).jsend.fail({ message: "Problem not found" });
+  }
+  if (problem.status == "closed" || problem.terminated) {
+    return res.status(400).jsend.fail({
+      message: "Problem is not active. Cannot volunteer",
+    });
+  }
+  if (problem.problemType !== "volunteering") {
+    return res.status(400).jsend.fail({
+      message: "Problem is not a volunteering problem",
+    });
+  }
 
   // Create the new user
   const volunteer = await Volunteerings.create({
