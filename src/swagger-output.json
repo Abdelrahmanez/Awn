@@ -84,8 +84,8 @@
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "400": {
+            "description": "Bad Request"
           }
         }
       }
@@ -147,6 +147,92 @@
             "description": "Internal Server Error"
           }
         }
+      },
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fullName": {
+                  "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                },
+                "phoneNumber": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                },
+                "passwordConfirmation": {
+                  "example": "any"
+                },
+                "address": {
+                  "example": "any"
+                },
+                "age": {
+                  "example": "any"
+                },
+                "skills": {
+                  "example": "any"
+                },
+                "isScorePrivate": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/user/volunteeringHistory": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
       }
     },
     "/api/v1/user/problem/{problemId}/volunteer": {
@@ -192,16 +278,6 @@
           },
           "404": {
             "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/api/v1/user/roles": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
           }
         }
       }
