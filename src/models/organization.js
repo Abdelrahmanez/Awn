@@ -72,6 +72,10 @@ const OrganizationSchema = new mongoose.Schema({
     instagram: { type: String },
   },
   tokens: [{ token: String, blocked: { type: Boolean, default: false } }],
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
 });
 
 // Middleware to update the `updatedAt` field before saving

@@ -58,6 +58,7 @@ const Volunteerings = require("../models/volunteerings");
 const mongoose = require("mongoose");
 const { organization } = require("../utils/userRoles");
 const Problem = require("../models/problem");
+const organizationService = require("../services/organizationService");
 
 exports.registerUserController = asyncHandler(async (req, res) => {
   const {
@@ -66,7 +67,9 @@ exports.registerUserController = asyncHandler(async (req, res) => {
     email,
     phoneNumber,
     password,
-    passwordConfirmation,
+    address,
+    birthDate,
+    skills,
   } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, hash);
@@ -80,16 +83,15 @@ exports.registerUserController = asyncHandler(async (req, res) => {
     email: email.toLowerCase(),
     phoneNumber,
     passwordHash: hashedPassword,
+    address,
+    birthDate,
+    skills,
   });
   user.save();
   return res.jsend.success({ user });
 });
 
 exports.loginUserController = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.jsend.fail(errors.array());
-  }
   const { emailOrUsername, password } = req.body;
 
   const lowercaseEmailOrUsername = emailOrUsername.toLowerCase();
@@ -174,7 +176,7 @@ exports.updateUserController = asyncHandler(async (req, res) => {
     password,
     passwordConfirmation,
     address,
-    age,
+    birthDate,
     skills,
     isScorePrivate,
   } = req.body;
@@ -202,7 +204,7 @@ exports.updateUserController = asyncHandler(async (req, res) => {
     };
   }
 
-  if (age) user.age = age;
+  if (birthDate) user.birthDate = birthDate;
   if (skills) user.skills = skills;
   if (isScorePrivate !== undefined) user.isScorePrivate = isScorePrivate;
 
@@ -270,6 +272,19 @@ exports.getVolunteeringHistory = asyncHandler(async (req, res) => {
   ]);
 
   return res.jsend.success({ volunteerings });
+});
+
+exports.getOrganizationById = asyncHandler(async (req, res) => {
+  const { organizationId } = req.params;
+  const organization =
+    await organizationService.getActiveAndNotDeletedOrganization({
+      organizationId,
+    });
+  if (!organization) {
+    return res.status(404).jsend.fail({ message: "Organization not found" });
+  }
+
+  return res.jsend.success(organization);
 });
 
 exports.sendhey = (req, res) => {

@@ -15,6 +15,14 @@ const organizationAdminSchema = new moongose.Schema({
       default: "manage_volunteers",
     },
   ],
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+  deletedAt: { type: Date, default: null },
+});
+
+organizationAdminSchema.pre("save", function (next) {
+  this.updatedAt = Date.now();
+  next();
 });
 
 module.exports = moongose.model("OrganizationAdmin", organizationAdminSchema);

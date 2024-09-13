@@ -36,12 +36,14 @@ const patchUserValidation = () => {
       .withMessage("Password must be at least 8 characters long"),
 
     // Validate passwordConfirmation if provided
-    body("passwordConfirmation").optional().custom((value, { req }) => {
-      if (value && value !== req.body.password) {
-        throw new Error("Passwords do not match");
-      }
-      return true;
-    }),
+    body("passwordConfirmation")
+      .optional()
+      .custom((value, { req }) => {
+        if (value && value !== req.body.password) {
+          throw new Error("Passwords do not match");
+        }
+        return true;
+      }),
 
     // Validate address fields if provided
     body("address.street").optional().isString(),
@@ -50,10 +52,12 @@ const patchUserValidation = () => {
     body("address.country").optional().isString(),
 
     // Validate age if provided
-    body("age")
+    body("birthDate")
       .optional()
-      .isInt({ min: 5, max: 100 })
-      .withMessage("Age must be between 5 and 100"),
+      .isDate()
+      .withMessage("Please enter a valid date of birth"),
+    body("skills").optional().isArray().withMessage("Skills must be an array"),
+    body("isScorePrivate").optional().isBoolean().withMessage("Invalid value must be a boolean"),
   ];
 };
 

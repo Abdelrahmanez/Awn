@@ -29,10 +29,10 @@ const registerValidation = () => {
     body("address.city").optional().isString(),
     body("address.state").optional().isString(),
     body("address.country").optional().isString(),
-    body("age")
+    body("birthDate")
       .optional()
-      .isInt({ min: 5, max: 100 })
-      .withMessage("Age must be between 5 and 100"),
+      .isDate()
+      .withMessage("Please enter a valid date"),
   ];
 };
 

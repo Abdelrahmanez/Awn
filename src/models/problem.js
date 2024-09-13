@@ -57,6 +57,7 @@ const problemSchema = new mongoose.Schema({
   terminated: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+  deletedAt: { type: Date, default: null },
 });
 
 // Middleware to update `updatedAt` field before saving

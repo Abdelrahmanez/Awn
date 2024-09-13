@@ -34,6 +34,7 @@ const volunteeringsSchema = new moongose.Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   updatedBy: { type: moongose.Schema.Types.ObjectId, ref: "User" },
+  deletedAt: { type: Date, default: null },
 });
 
 const VolunteeringHistory = moongose.model(

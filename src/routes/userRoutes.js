@@ -32,7 +32,12 @@ router.post(
   userController.registerUserController
 );
 
-router.post("/login", loginValidation(), userController.loginUserController);
+router.post(
+  "/login",
+  loginValidation(),
+  validation,
+  userController.loginUserController
+);
 
 router
   .get(
@@ -43,9 +48,9 @@ router
   )
   .patch(
     "/profile",
-    patchUserValidation(),
     authentication,
     authorise(userRoles.user),
+    patchUserValidation(),
     userController.updateUserController
   );
 
@@ -58,11 +63,13 @@ router.get(
 
 router.post(
   "/problem/:problemId/volunteer",
-  volnuteerValidation(),
-  validation,
   authentication,
   authorise(userRoles.user),
+  volnuteerValidation(),
+  validation,
   userController.volunteerController
 );
+
+router.get("/:organizationId", userController.getOrganizationById);
 
 module.exports = router;

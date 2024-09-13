@@ -27,6 +27,10 @@ const branchSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
 });
 
 // Middleware to update the `updatedAt` field before saving
