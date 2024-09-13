@@ -57,10 +57,6 @@ const { validationResult } = require("express-validator");
 const Volunteerings = require("../models/volunteerings");
 
 exports.registerUserController = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.jsend.fail(errors.array());
-  }
   const {
     fullName,
     username,
@@ -115,10 +111,6 @@ exports.loginUserController = asyncHandler(async (req, res) => {
 });
 
 exports.volunteerController = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.jsend.fail(errors.array());
-  }
   const { problemId } = req.params;
   const { joinedDays, branchId } = req.body;
   const userId = req.user._id;
@@ -149,6 +141,65 @@ exports.getProfile = async (req, res) => {
     res.status(500).jsend.error({ message: error.message });
   }
 };
+
+exports.updateUserController = asyncHandler(async (req, res) => {
+  // Ensure that the request contains valid data
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).jsend.fail({ errors: errors.array() });
+  }
+
+  const {
+    fullName,
+    email,
+    phoneNumber,
+    password,
+    passwordConfirmation,
+    address,
+    age,
+    skills,
+    isScorePrivate,
+  } = req.body;
+
+  // Check if password and password confirmation match
+  if (password && password !== passwordConfirmation) {
+    return res.status(400).jsend.fail({ message: "Passwords do not match" });
+  }
+
+  // Fetch the user from the database
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return res.status(404).jsend.fail({ message: "User not found" });
+  }
+
+  // Update user details
+  if (fullName) user.fullName = fullName;
+  if (email) user.email = email.toLowerCase();
+  if (phoneNumber) user.phoneNumber = phoneNumber;
+
+  if (address) {
+    user.address = {
+      ...user.address, // Preserve existing address fields
+      ...address, // Update with provided address fields
+    };
+  }
+
+  if (age) user.age = age;
+  if (skills) user.skills = skills;
+  if (isScorePrivate !== undefined) user.isScorePrivate = isScorePrivate;
+
+  // Update password if provided
+  if (password) {
+    const hashedPassword = await bcrypt.hash(password, 10); // Use 10 as the salt rounds
+    user.passwordHash = hashedPassword;
+  }
+
+  // Save the updated user
+  await user.save();
+
+  // Return success response
+  return res.jsend.success({ user });
+});
 
 exports.sendhey = (req, res) => {
   // authenticateToken(req, res);

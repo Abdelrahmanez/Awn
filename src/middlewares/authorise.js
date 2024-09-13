@@ -1,4 +1,3 @@
-const organizationAdmin = require("../models/organizationAdmin");
 
 module.exports = (...roles) => {
 

@@ -50,18 +50,18 @@ const userSchema = new Schema({
   //   },
   // ],
 
-  donationHistory: [
-    {
-      problemId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Problem",
-        required: true,
-      },
-      amount: { type: Number, required: true },
-      date: { type: Date, default: Date.now },
-      proofImage: { type: String }, // Optional: Image of the receipt
-    },
-  ],
+  // donationHistory: [
+  //   {
+  //     problemId: {
+  //       type: mongoose.Schema.Types.ObjectId,
+  //       ref: "Problem",
+  //       required: true,
+  //     },
+  //     amount: { type: Number, required: true },
+  //     date: { type: Date, default: Date.now },
+  //     proofImage: { type: String }, // Optional: Image of the receipt
+  //   },
+  // ],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   tokens: [{ token: String, blocked: { type: Boolean, default: false } }],

@@ -14,6 +14,8 @@ const authentication = require("../middlewares/authentication");
 const authorise = require("../middlewares/authorise");
 const userRoles = require("../utils/userRoles");
 const volnuteerValidation = require("../middlewares/validations/volnuteerValidation");
+const validation = require("../middlewares/validations/validationResult");
+const patchUserValidation = require("../middlewares/validations/patchUserValidation");
 
 // GET / - prints hello world
 router.get("/", auth, userController.sendHello);
@@ -25,29 +27,35 @@ router.post("/", userController.sendhey);
 router.post(
   "/signup",
   registerValidation(),
+  validation,
   checkUserExists,
   userController.registerUserController
 );
 
 router.post("/login", loginValidation(), userController.loginUserController);
 
-router.get(
-  "/profile",
-  authentication,
-  authorise(userRoles.user),
-  userController.getProfile
-);
+router
+  .get(
+    "/profile",
+    authentication,
+    authorise(userRoles.user),
+    userController.getProfile
+  )
+  .patch(
+    "/profile",
+    patchUserValidation(),
+    authentication,
+    authorise(userRoles.user),
+    userController.updateUserController
+  );
 
 router.post(
   "/problem/:problemId/volunteer",
   volnuteerValidation(),
+  validation,
   authentication,
   authorise(userRoles.user),
   userController.volunteerController
 );
-
-router.get("/roles", (req, res) => {
-  res.json(userRoles);
-});
 
 module.exports = router;
