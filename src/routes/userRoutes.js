@@ -16,6 +16,8 @@ const userRoles = require("../utils/userRoles");
 const volnuteerValidation = require("../middlewares/validations/volnuteerValidation");
 const validation = require("../middlewares/validations/validationResult");
 const patchUserValidation = require("../middlewares/validations/patchUserValidation");
+const organizationService = require("../services/organizationService");
+const isMongoObjectId = require("../middlewares/validations/isMongoObjectId");
 
 // GET / - prints hello world
 router.get("/", auth, userController.sendHello);
@@ -32,6 +34,7 @@ router.post(
   userController.registerUserController
 );
 
+// login a user
 router.post(
   "/login",
   loginValidation(),
@@ -40,12 +43,14 @@ router.post(
 );
 
 router
+  // get the profile of a user
   .get(
     "/profile",
     authentication,
     authorise(userRoles.user),
     userController.getProfile
   )
+  // update the profile of a user
   .patch(
     "/profile",
     authentication,
@@ -54,6 +59,7 @@ router
     userController.updateUserController
   );
 
+// get the volunteering history of a user
 router.get(
   "/volunteeringHistory",
   authentication,
@@ -61,6 +67,7 @@ router.get(
   userController.getVolunteeringHistory
 );
 
+// volunteer for a problem
 router.post(
   "/problem/:problemId/volunteer",
   authentication,
@@ -70,6 +77,34 @@ router.post(
   userController.volunteerController
 );
 
-router.get("/:organizationId", userController.getOrganizationById);
+// gets specific organization by id which is not deleted and active
+router.get(
+  "/organizations/:organizationId",
+  isMongoObjectId({ attribute: "organizationId" }),
+  validation,
+  userController.getOrganizationById
+);
+
+// get all the problems for a specific organization which are not deleted and not terminated
+router.get(
+  "/:organizationId/problems",
+  isMongoObjectId({ attribute: "organizationId" }),
+  validation,
+  userController.getOrganizationProblems
+);
+
+// gets all organizations which are not deleted and active
+router.get("/organizations", userController.getAllOrganizations);
+
+// gets all problems for all organizations which are not deleted and not terminated
+router.get("/problems", userController.getAllProblems);
+
+// get problem by id which is not deleted and terminated and not completed (open or in progress)
+router.get(
+  "/problems/:problemId",
+  isMongoObjectId({ attribute: "problemId" }),
+  validation,
+  userController.getProblemById
+);
 
 module.exports = router;

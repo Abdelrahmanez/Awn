@@ -60,6 +60,7 @@ const { organization } = require("../utils/userRoles");
 const Problem = require("../models/problem");
 const organizationService = require("../services/organizationService");
 
+
 exports.registerUserController = asyncHandler(async (req, res) => {
   const {
     fullName,
@@ -274,6 +275,7 @@ exports.getVolunteeringHistory = asyncHandler(async (req, res) => {
   return res.jsend.success({ volunteerings });
 });
 
+// get a specific organization by id which is not deleted and active
 exports.getOrganizationById = asyncHandler(async (req, res) => {
   const { organizationId } = req.params;
   const organization =
@@ -285,6 +287,55 @@ exports.getOrganizationById = asyncHandler(async (req, res) => {
   }
 
   return res.jsend.success(organization);
+});
+
+// get all organizations which are not deleted and active
+exports.getAllOrganizations = asyncHandler(async (req, res) => {
+  const organizations = await organizationService.getAllOrganizations();
+  if (!organizations || organizations.length === 0) {
+    return res.status(404).jsend.fail({ message: "No organizations found" });
+  }
+  return res.status(200).jsend.success({ organizations });
+});
+
+// get all problems for a specific organization which are not deleted and not terminated
+exports.getOrganizationProblems = asyncHandler(async (req, res) => {
+  const { organizationId } = req.params;
+  const { status } = req.body.status ? req.body.status : { status: "open" };
+
+  const problems = await organizationService.getOrganizationProblems({
+    organizationId,
+    status,
+  });
+  if (!problems) {
+    return res.status(404).jsend.fail({ message: "No problems found" });
+  }
+
+  return res.jsend.success({ problems });
+});
+
+// get all problems for all organizations which are not deleted and not terminated
+exports.getAllProblems = asyncHandler(async (req, res) => {
+  const { status } = req.body.status ? req.body.status : { status: "open" };
+  console.log(status);
+
+  const problems = await organizationService.getAllProblems({ status });
+  if (!problems) {
+    return res.status(404).jsend.fail({ message: "No problems found" });
+  }
+
+  return res.status(200).jsend.success({ problems });
+});
+
+exports.getProblemById = asyncHandler(async (req, res) => {
+  const { problemId } = req.params;
+
+  const problem = await organizationService.getProblemById({ problemId });
+  if (!problem) {
+    return res.status(404).jsend.fail({ message: "Problem not found" });
+  }
+
+  return res.jsend.success(problem);
 });
 
 exports.sendhey = (req, res) => {
