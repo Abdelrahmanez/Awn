@@ -120,13 +120,14 @@ exports.volunteerController = asyncHandler(async (req, res) => {
     return res.jsend.fail(errors.array());
   }
   const { problemId } = req.params;
-  const { joinedDays } = req.body;
+  const { joinedDays, branchId } = req.body;
   const userId = req.user._id;
 
   // Create the new user
   const volunteer = await Volunteerings.create({
     problemId,
     userId,
+    branchId,
     joinedDays,
   });
   volunteer.save();

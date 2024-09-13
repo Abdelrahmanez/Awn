@@ -1,46 +1,38 @@
 const mongoose = require("mongoose");
+const userRoles = require("../utils/userRoles");
 
 const OrganizationSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true, // Organization name is required
+    required: true,
+  },
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  role: {
+    type: String,
+    default: userRoles.organization,
   },
   description: {
     type: String,
-    required: false, // Optional description of the organization
   },
   slogan: {
     type: String,
-    required: false, // Optional slogan of the organization
+  },
+  passwordHash: {
+    type: String,
+    required: true,
   },
   contactPhoneNumbers: [
     {
       type: String,
-      required: false, // Optional phone numbers
     },
   ],
   contactEmails: [
     {
       type: String,
-      required: false, // Optional email addresses
-    },
-  ],
-  branches: [
-    {
-      name: { type: String, required: true },
-      address: {
-        street: { type: String, required: false },
-        state: { type: String, required: false },
-        city: { type: String, required: false },
-        country: { type: String, required: true },
-        locationLink: { type: String, required: false }, // Fixed typo here
-      },
-      contactPhoneNumbers: [
-        {
-          type: String,
-          required: false,
-        },
-      ], // Changed to an array of strings
     },
   ],
   paymentDetails: [
@@ -49,46 +41,37 @@ const OrganizationSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-      details: { type: String, required: true }, // Added `required: true`
+      details: {
+        type: String,
+        required: true,
+      },
     },
   ],
-  // admins: [
-  //   {
-  //     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  //     role: {
-  //       type: String,
-  //       enum: ["manage_volunteers", "post_problems", "manage_roles"],
-  //       required: true,
-  //     },
-  //   },
-  // ],
-  problems: [{ type: mongoose.Schema.Types.ObjectId, ref: "Problem" }],
   website: {
     type: String,
-    required: false, // Optional website URL
   },
   createdAt: {
     type: Date,
-    default: Date.now, // Automatically set to the current date
+    default: Date.now,
   },
   updatedAt: {
     type: Date,
-    default: Date.now, // Automatically set to the current date
-  },  
+    default: Date.now,
+  },
   isActive: {
     type: Boolean,
-    default: true, // Organization is active by default
+    default: true,
   },
   logo: {
     type: String,
-    required: false, // Organization's logo
   },
   socialMedia: {
-    facebook: { type: String, required: false },
-    x: { type: String, required: false },
-    linkedIn: { type: String, required: false },
-    instagram: { type: String, required: false },
+    facebook: { type: String },
+    x: { type: String },
+    linkedIn: { type: String },
+    instagram: { type: String },
   },
+  tokens: [{ token: String, blocked: { type: Boolean, default: false } }],
 });
 
 // Middleware to update the `updatedAt` field before saving

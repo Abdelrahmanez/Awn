@@ -4,28 +4,33 @@ const hash = 10;
 const {
   generateAccessToken,
   generateRefreshToken,
+  generateOrganizationAccessToken,
+  generateOrganizationRefreshToken,
 } = require("../middlewares/jwtTokens");
 const asyncHandler = require("express-async-handler");
 const { validationResult } = require("express-validator");
 const Problem = require("../models/problem");
 const OrganizationAdmin = require("../models/organizationAdmin");
+const Branch = require("../models/branch");
 
 exports.registerOrganizationController = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.jsend.fail(errors.array());
+  }
+
   const {
     name,
-    slogan,
     description,
+    username,
+    slogan,
+    password,
+    contactPhoneNumbers,
+    contactEmails,
+    paymentDetails,
     website,
-    policies,
-    address,
     logo,
     socialMedia,
-    mission,
-    username,
-    email,
-    phoneNumber,
-    password,
-    
   } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, hash);
@@ -33,38 +38,38 @@ exports.registerOrganizationController = asyncHandler(async (req, res) => {
   // Create the new user
   const organization = await Organization.create({
     name,
-    slogan,
     description,
+    username: username.toLowerCase(),
+    slogan,
+    passwordHash: hashedPassword,
+    contactPhoneNumbers,
+    contactEmails,
+    paymentDetails,
     website,
-    policies,
-    address,
     logo,
     socialMedia,
-    mission,
-    // Convert the username to lowercase
-    username: username.toLowerCase(),
-    // Convert the email to lowercase
-    email: email.toLowerCase(),
-    phoneNumber,
-    passwordHash: hashedPassword,
   });
   organization.save();
   res.status(201).json({
     message: "organization created successfully",
     organization: organization,
   });
-  return user;
+  return organization;
 });
 
 exports.loginOrganizationController = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
+  const { emailOrUsername, password } = req.body;
 
   const organization = await Organization.findOne({
-    username: username.toLowerCase(),
+    username: emailOrUsername.toLowerCase(),
   });
 
   if (!organization) {
-    res.status(400).jsend.fail("Organization does not exist");
+    return res.status(400).jsend.fail("Organization does not exist");
+  }
+
+  if (!organization.isActive) {
+    return res.status(400).jsend.fail("Organization is not active");
   }
 
   const validPassword = await bcrypt.compare(
@@ -73,11 +78,11 @@ exports.loginOrganizationController = asyncHandler(async (req, res) => {
   );
 
   if (!validPassword) {
-    res.status(400).jsend.fail("Invalid password");
+    return res.status(400).jsend.fail("Invalid password");
   }
 
-  const accessToken = generateAccessToken(organization);
-  const refreshToken = generateRefreshToken(organization);
+  const accessToken = await generateOrganizationAccessToken(organization);
+  const refreshToken = await generateOrganizationRefreshToken(organization);
 
   res.status(200).jsend.success({
     accessToken: accessToken,
@@ -128,7 +133,6 @@ exports.addProblemController = asyncHandler(async (req, res) => {
     endDate,
   };
 
-
   // Attach donationDetails if the problemType is "donation" or "both"
   if (problemType === "donation" || problemType === "both") {
     problemData.donationDetails = donationDetails;
@@ -145,6 +149,28 @@ exports.addProblemController = asyncHandler(async (req, res) => {
   res.status(201).jsend.success({
     message: "Problem created successfully",
     problem: problem,
+  });
+
+  return;
+});
+
+exports.addBranchController = asyncHandler(async (req, res) => {
+  console.log("addBranchController");
+
+  const { name, address, location, contactPhoneNumbers } = req.body;
+  const organizationId = req.user.organizationId;
+
+  const branch = await Branch.create({
+    organizationId,
+    name,
+    address,
+    location,
+    contactPhoneNumbers
+  });
+
+  res.status(201).jsend.success({
+    message: "Branch created successfully",
+    branch: branch,
   });
 
   return;

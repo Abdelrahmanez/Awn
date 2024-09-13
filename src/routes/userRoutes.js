@@ -46,4 +46,8 @@ router.post(
   userController.volunteerController
 );
 
+router.get("/roles", (req, res) => {
+  res.json(userRoles);
+});
+
 module.exports = router;

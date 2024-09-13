@@ -15,15 +15,24 @@ const validOrganizationId = require("../middlewares/validOrganizationId");
 const OrganizationAdmin = require("../models/organizationAdmin");
 const User = require("../models/user");
 const updateProblemValidation = require("../middlewares/validations/updateProblemValidation");
-
+const organizationRegistrationValidation = require("../middlewares/validations/organizationRegisterValidation");
+const loginValidation = require("../middlewares/validations/loginValidation");
+const organizationAuthentication = require("../middlewares/OrganizationMiddlewares/OrganizationAuthentication");
+const validation = require("../middlewares/validations/validationResult");
+const addBranchValidation = require("../middlewares/validations/addBranchValidation");
 // POST / - add a new organization
 router.post(
   "/register",
+  organizationRegistrationValidation(),
   checkOrganizationExists,
   registerOrganizationController
 );
 
-router.post("/login", organizationConrollers.loginOrganizationController);
+router.post(
+  "/login",
+  loginValidation(),
+  organizationConrollers.loginOrganizationController
+);
 
 router.post(
   "/problem",
@@ -39,6 +48,15 @@ router.patch(
   authentication,
   authorise(userRoles.post_problems, userRoles.organizationAdmin)
   // organizationControllers.updateProblemController
+);
+
+router.post(
+  "/add-branch",
+  addBranchValidation(),
+  validation,
+  authentication,
+  authorise(userRoles.manage_branches, userRoles.organization),
+  organizationControllers.addBranchController
 );
 
 router.post("/add-admin", async (req, res) => {
@@ -62,7 +80,7 @@ router.post("/add-admin", async (req, res) => {
     await admin.save(); // Save the new OrganizationAdmin document
 
     // Update the user role
-    user.role = role; // Assuming `role` is a field on the User model
+    user.role = userRoles.admin; // Assuming `role` is a field on the User model
     await user.save();
 
     res.status(201).jsend.success({ admin, user });

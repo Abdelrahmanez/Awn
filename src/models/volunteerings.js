@@ -17,6 +17,11 @@ const volunteeringsSchema = new moongose.Schema({
     ref: "Problem",
     required: true,
   },
+  branchId: {
+    type: moongose.Schema.Types.ObjectId,
+    ref: "Organization.branches",
+    required: true,
+  },
   joinedDays: [
     {
       dateId: {
@@ -28,7 +33,7 @@ const volunteeringsSchema = new moongose.Schema({
   ],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-  updatedBy: { type: moongose.Schema.Types.ObjectId, ref: "User"  },
+  updatedBy: { type: moongose.Schema.Types.ObjectId, ref: "User" },
 });
 
 const VolunteeringHistory = moongose.model(
