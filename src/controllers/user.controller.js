@@ -347,6 +347,19 @@ exports.getProblemById = asyncHandler(async (req, res) => {
   return res.jsend.success(problem);
 });
 
+exports.getOrganizationBranches = asyncHandler(async (req, res) => {
+  const { organizationId } = req.params;
+
+  const branches = await organizationService.getOrganizationBranches({
+    organizationId,
+  });
+  if (!branches) {
+    return res.status(404).jsend.fail({ message: "No branches found" });
+  }
+
+  return res.jsend.success({ branches });
+});
+
 exports.sendhey = (req, res) => {
   // authenticateToken(req, res);
   console.log("hey");

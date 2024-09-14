@@ -97,7 +97,9 @@ exports.getAllProblems = async ({
 
     // If problemType is provided, filter by problemType
     if (problemType) {
-      const problemTypeArray = problemType.split(",").map((type) => type.trim());
+      const problemTypeArray = problemType
+        .split(",")
+        .map((type) => type.trim());
       query.problemType = { $in: problemTypeArray };
     }
 
@@ -129,7 +131,7 @@ exports.getAllProblems = async ({
 
       // Find branches that match both city and state
       const matchingBranches = await Branch.find(branchQuery).select("_id");
-      branchIds = matchingBranches.map(branch => branch._id);
+      branchIds = matchingBranches.map((branch) => branch._id);
     }
 
     // If branchIds are found, filter problems based on them
@@ -147,3 +149,15 @@ exports.getAllProblems = async ({
   }
 };
 
+exports.getOrganizationBranches = async ({ organizationId }) => {
+  const branches = await Branch.find({
+    organizationId,
+    deletedAt: null,
+  });
+
+  if (!branches) {
+    throw new Error("No branches found for this organization");
+  }
+
+  return branches;
+};

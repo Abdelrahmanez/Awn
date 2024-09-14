@@ -113,6 +113,14 @@ router.get(
   userController.getProblemById
 );
 
+// get all bracnhes for a specific organization
+router.get(
+  "/organizations/:organizationId/branches",
+  isMongoObjectId({ attribute: "organizationId" }),
+  validation,
+  userController.getOrganizationBranches
+);
+
 //get all problems with a query for category, Date, location, organization , required skills
 
 module.exports = router;
