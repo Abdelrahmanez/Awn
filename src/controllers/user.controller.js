@@ -353,7 +353,7 @@ exports.getOrganizationBranches = asyncHandler(async (req, res) => {
   const branches = await organizationService.getOrganizationBranches({
     organizationId,
   });
-  if (!branches) {
+  if (!branches || branches == []) {
     return res.status(404).jsend.fail({ message: "No branches found" });
   }
 
