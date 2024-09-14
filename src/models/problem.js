@@ -61,8 +61,25 @@ const problemSchema = new mongoose.Schema({
 });
 
 // Middleware to update `updatedAt` field before saving
+// Middleware to update `updatedAt` field before saving
 problemSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
+
+  if (
+    (this.problemType === "both" || this.problemType === "volunteering") &&
+    this.volunteeringDetails.availableDates.length !== 0
+  ) {
+    // Ensure all dates in availableDates are stored as UTC midnight
+    this.volunteeringDetails.availableDates =
+      this.volunteeringDetails.availableDates.map((dateEntry) => {
+        if (dateEntry.date) {
+          // Set the time to midnight in UTC
+          dateEntry.date = new Date(dateEntry.date.setUTCHours(0, 0, 0, 0));
+        }
+        return dateEntry;
+      });
+  }
+
   next();
 });
 

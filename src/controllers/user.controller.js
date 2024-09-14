@@ -60,7 +60,6 @@ const { organization } = require("../utils/userRoles");
 const Problem = require("../models/problem");
 const organizationService = require("../services/organizationService");
 
-
 exports.registerUserController = asyncHandler(async (req, res) => {
   const {
     fullName,
@@ -315,11 +314,21 @@ exports.getOrganizationProblems = asyncHandler(async (req, res) => {
 });
 
 // get all problems for all organizations which are not deleted and not terminated
-exports.getAllProblems = asyncHandler(async (req, res) => {
-  const { status } = req.body.status ? req.body.status : { status: "open" };
-  console.log(status);
+exports.getProblems = asyncHandler(async (req, res) => {
+  const { category, city, state, skills, date, problemType, status } =
+    req.query;
 
-  const problems = await organizationService.getAllProblems({ status });
+  console.log(req.query);
+
+  const problems = await organizationService.getAllProblems({
+    status,
+    category,
+    city,
+    state,
+    skills,
+    date,
+    problemType,
+  });
   if (!problems) {
     return res.status(404).jsend.fail({ message: "No problems found" });
   }

@@ -1,6 +1,7 @@
 const Organization = require("../models/Organization");
 const Problem = require("../models/problem");
 const mongoose = require("mongoose");
+const Branch = require("../models/branch");
 
 // get specific organization which is not deleted and active
 exports.getActiveAndNotDeletedOrganization = async ({ organizationId }) => {
@@ -62,12 +63,87 @@ exports.getOrganizationDeletedProblem = async ({ organizationId }) => {
 };
 
 // get all problems which are not deleted and not terminated
-exports.getAllProblems = async ({ status }) => {
-  const problems = await Problem.find({
-    deletedAt: null,
-    terminated: false,
-    status,
-  });
 
-  return problems;
+exports.getAllProblems = async ({
+  status,
+  category,
+  city,
+  state,
+  skills,
+  problemType,
+  date,
+}) => {
+  try {
+    let query = {
+      deletedAt: null,
+      terminated: false,
+    };
+
+    // If status is provided, filter by status
+    if (status) {
+      query.status = status;
+    }
+
+    // If category is provided, filter by category
+    if (category) {
+      query.problemCategory = { $in: category };
+    }
+
+    // If skills is provided, filter by skills
+    if (skills) {
+      const skillsArray = skills.split(",").map((skill) => skill.trim());
+      query["volunteeringDetails.activities.type"] = { $in: skillsArray };
+    }
+
+    // If problemType is provided, filter by problemType
+    if (problemType) {
+      const problemTypeArray = problemType.split(",").map((type) => type.trim());
+      query.problemType = { $in: problemTypeArray };
+    }
+
+    // If date is provided, filter by date
+    if (date) {
+      const startOfDay = new Date(date.trim());
+      const endOfDay = new Date(date.trim());
+      startOfDay.setUTCHours(0, 0, 0, 0);
+      endOfDay.setUTCHours(23, 59, 59, 999);
+
+      query["volunteeringDetails.availableDates"] = {
+        $elemMatch: {
+          date: { $gte: startOfDay, $lt: endOfDay },
+        },
+      };
+    }
+
+    let branchIds = [];
+
+    // Combine both city and state conditions for branches
+    if (city || state) {
+      const branchQuery = {};
+      if (city) {
+        branchQuery["address.city"] = city;
+      }
+      if (state) {
+        branchQuery["address.state"] = state;
+      }
+
+      // Find branches that match both city and state
+      const matchingBranches = await Branch.find(branchQuery).select("_id");
+      branchIds = matchingBranches.map(branch => branch._id);
+    }
+
+    // If branchIds are found, filter problems based on them
+    if (branchIds.length > 0) {
+      query["volunteeringDetails.branches"] = { $in: branchIds };
+    } else {
+      // If no branches are found, no problems should be returned
+      query["volunteeringDetails.branches"] = { $in: [] };
+    }
+
+    const problems = await Problem.find(query);
+    return problems;
+  } catch (error) {
+    throw error;
+  }
 };
+

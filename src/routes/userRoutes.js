@@ -18,6 +18,7 @@ const validation = require("../middlewares/validations/validationResult");
 const patchUserValidation = require("../middlewares/validations/patchUserValidation");
 const organizationService = require("../services/organizationService");
 const isMongoObjectId = require("../middlewares/validations/isMongoObjectId");
+const problemQueriesValidation = require("../middlewares/validations/problemQueriesValidation");
 
 // GET / - prints hello world
 router.get("/", auth, userController.sendHello);
@@ -97,7 +98,12 @@ router.get(
 router.get("/organizations", userController.getAllOrganizations);
 
 // gets all problems for all organizations which are not deleted and not terminated
-router.get("/problems", userController.getAllProblems);
+router.get(
+  "/problems",
+  problemQueriesValidation(),
+  validation,
+  userController.getProblems
+);
 
 // get problem by id which is not deleted and terminated and not completed (open or in progress)
 router.get(
@@ -106,5 +112,7 @@ router.get(
   validation,
   userController.getProblemById
 );
+
+//get all problems with a query for category, Date, location, organization , required skills
 
 module.exports = router;
