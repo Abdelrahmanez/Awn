@@ -5,20 +5,23 @@ const userController = require("../controllers/user.controller");
 const {
   registerOrganizationController,
 } = require("../controllers/organization.controllers");
-const checkUserExists = require("../middlewares/checkUserExists");
-const registerValidation = require("../middlewares/validations/userRegisterValidation");
-const tokenBlocked = require("../middlewares/tokenBlocked");
+const checkUserExists = require("../middlewares/validations/checkUserExists");
+const userValidation = require("../middlewares/validations/userValidation");
 const loginValidation = require("../middlewares/validations/loginValidation");
-const auth = require("../middlewares/authentication");
-const authentication = require("../middlewares/authentication");
-const authorise = require("../middlewares/authorise");
+const auth = require("../middlewares/auth/authentication");
+const authentication = require("../middlewares/auth/authentication");
+const authorise = require("../middlewares/auth/authorise");
 const userRoles = require("../utils/userRoles");
 const volnuteerValidation = require("../middlewares/validations/volnuteerValidation");
 const validation = require("../middlewares/validations/validationResult");
-const patchUserValidation = require("../middlewares/validations/patchUserValidation");
-const organizationService = require("../services/organizationService");
 const isMongoObjectId = require("../middlewares/validations/isMongoObjectId");
-const problemQueriesValidation = require("../middlewares/validations/problemQueriesValidation");
+
+const upload = require("../middlewares/profileMulterConfig");
+const {
+  addProblemValidation,
+  updateProblemValidation,
+  problemQueriesValidation,
+} = require("../middlewares/validations/ProblemValidation");
 
 // GET / - prints hello world
 router.get("/", auth, userController.sendHello);
@@ -29,7 +32,8 @@ router.post("/", userController.sendhey);
 // POST /signup - Create a new user
 router.post(
   "/signup",
-  registerValidation(),
+  upload.single("profileImage"),
+  userValidation.registerValidation(),
   validation,
   checkUserExists,
   userController.registerUserController
@@ -56,7 +60,7 @@ router
     "/profile",
     authentication,
     authorise(userRoles.user),
-    patchUserValidation(),
+    userValidation.patchUserValidation(),
     userController.updateUserController
   );
 
@@ -97,7 +101,7 @@ router.get(
 // gets all organizations which are not deleted and active
 router.get("/organizations", userController.getAllOrganizations);
 
-// gets all problems for all organizations which are not deleted and not terminated
+//get all problems with a query for category, Date, location, organization , required skills
 router.get(
   "/problems",
   problemQueriesValidation(),
@@ -120,7 +124,5 @@ router.get(
   validation,
   userController.getOrganizationBranches
 );
-
-//get all problems with a query for category, Date, location, organization , required skills
 
 module.exports = router;

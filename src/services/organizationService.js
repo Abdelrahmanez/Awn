@@ -89,7 +89,7 @@ exports.getAllProblems = async ({
       query.problemCategory = { $in: category };
     }
 
-    // If skills is provided, filter by skills
+    // If skills are provided, filter by skills
     if (skills) {
       const skillsArray = skills.split(",").map((skill) => skill.trim());
       query["volunteeringDetails.activities.type"] = { $in: skillsArray };
@@ -117,6 +117,8 @@ exports.getAllProblems = async ({
       };
     }
 
+    console.log(query);
+
     let branchIds = [];
 
     // Combine both city and state conditions for branches
@@ -129,7 +131,7 @@ exports.getAllProblems = async ({
         branchQuery["address.state"] = state;
       }
 
-      // Find branches that match both city and state
+      // Find branches that match the city and/or state
       const matchingBranches = await Branch.find(branchQuery).select("_id");
       branchIds = matchingBranches.map((branch) => branch._id);
     }
@@ -137,9 +139,6 @@ exports.getAllProblems = async ({
     // If branchIds are found, filter problems based on them
     if (branchIds.length > 0) {
       query["volunteeringDetails.branches"] = { $in: branchIds };
-    } else {
-      // If no branches are found, no problems should be returned
-      query["volunteeringDetails.branches"] = { $in: [] };
     }
 
     const problems = await Problem.find(query);
@@ -148,6 +147,7 @@ exports.getAllProblems = async ({
     throw error;
   }
 };
+
 
 exports.getOrganizationBranches = async ({ organizationId }) => {
   const branches = await Branch.find({

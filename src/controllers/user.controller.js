@@ -49,9 +49,9 @@ const hash = 10;
 const {
   generateAccessToken,
   generateRefreshToken,
-} = require("../middlewares/jwtTokens");
-const authenticateToken = require("../middlewares/authentication");
-const isActiveAccount = require("../middlewares/isActiveAccount");
+} = require("../middlewares/auth/jwtTokens");
+const authenticateToken = require("../middlewares/auth/authentication");
+const isActiveAccount = require("../middlewares/auth/isActiveAccount");
 const asyncHandler = require("express-async-handler");
 const { validationResult } = require("express-validator");
 const Volunteerings = require("../models/volunteerings");
@@ -59,8 +59,10 @@ const mongoose = require("mongoose");
 const { organization } = require("../utils/userRoles");
 const Problem = require("../models/problem");
 const organizationService = require("../services/organizationService");
+const { renameImageFile } = require("../utils/imageHelper");
 
 exports.registerUserController = asyncHandler(async (req, res) => {
+  console.log(req.file);
   const {
     fullName,
     username,
@@ -71,7 +73,6 @@ exports.registerUserController = asyncHandler(async (req, res) => {
     birthDate,
     skills,
   } = req.body;
-
   const hashedPassword = await bcrypt.hash(password, hash);
 
   // Create the new user
@@ -87,6 +88,13 @@ exports.registerUserController = asyncHandler(async (req, res) => {
     birthDate,
     skills,
   });
+
+  // Rename the profile image file to match the user's id
+  const profileImage = renameImageFile(req.file, user._id);
+  if (profileImage) {
+    user.profileImage = profileImage;
+  }
+
   user.save();
   return res.jsend.success({ user });
 });

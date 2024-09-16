@@ -6,7 +6,7 @@ const {
   generateRefreshToken,
   generateOrganizationAccessToken,
   generateOrganizationRefreshToken,
-} = require("../middlewares/jwtTokens");
+} = require("../middlewares/auth/jwtTokens");
 const asyncHandler = require("express-async-handler");
 const { validationResult } = require("express-validator");
 const Problem = require("../models/problem");

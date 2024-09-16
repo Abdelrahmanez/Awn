@@ -4,21 +4,20 @@ const router = express.Router();
 const {
   registerOrganizationController,
 } = require("../controllers/organization.controllers");
-const checkOrganizationExists = require("../middlewares/checkOrganizationExists");
+const checkOrganizationExists = require("../middlewares/validations/checkOrganizationExists");
 const organizationConrollers = require("../controllers/organization.controllers");
-const addProblemValidation = require("../middlewares/validations/addProblemValidation");
-const authorise = require("../middlewares/authorise");
+const ProblemValidation = require("../middlewares/validations/ProblemValidation");
+const authorise = require("../middlewares/auth/authorise");
 const userRoles = require("../utils/userRoles");
-const authentication = require("../middlewares/authentication");
+const authentication = require("../middlewares/auth/authentication");
 const organizationControllers = require("../controllers/organization.controllers");
-const validOrganizationId = require("../middlewares/validOrganizationId");
 const OrganizationAdmin = require("../models/organizationAdmin");
 const User = require("../models/user");
-const updateProblemValidation = require("../middlewares/validations/updateProblemValidation");
-const organizationRegistrationValidation = require("../middlewares/validations/organizationRegisterValidation");
+const organizationRegistrationValidation = require("../middlewares/validations/organizationValidation");
 const loginValidation = require("../middlewares/validations/loginValidation");
-const addBranchValidation = require("../middlewares/validations/addBranchValidation");
+const addBranchValidation = require("../middlewares/validations/BranchValidation");
 const validation = require("../middlewares/validations/validationResult");
+const problem = require("../models/problem");
 // POST / - add a new organization
 router.post(
   "/register",
@@ -35,16 +34,20 @@ router.post(
 
 router.post(
   "/problem",
-  addProblemValidation(),
+  ProblemValidation.addProblemValidation(),
   validation,
   authentication,
-  authorise(userRoles.post_problems, userRoles.organizationAdmin , userRoles.organization),
+  authorise(
+    userRoles.post_problems,
+    userRoles.organizationAdmin,
+    userRoles.organization
+  ),
   organizationControllers.addProblemController
 );
 
 router.patch(
   "/problem/:id",
-  updateProblemValidation(),
+  ProblemValidation.updateProblemValidation(),
   authentication,
   authorise(userRoles.post_problems, userRoles.organizationAdmin)
   // organizationControllers.updateProblemController

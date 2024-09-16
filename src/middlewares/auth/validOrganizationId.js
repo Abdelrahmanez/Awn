@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Organization = require("../models/Organization");
+const Organization = require("../../models/Organization");
 
 const validOrganizationId = async (req, res, next) => {
   const { organizationId } = req.body;

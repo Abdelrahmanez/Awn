@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
+const User = require("../../models/user");
 const asyncHandler = require("express-async-handler");
 const { validationResult } = require("express-validator");
-const userRoles = require("../utils/userRoles");
-const OrganizationAdmin = require("../models/organizationAdmin");
-const Organization = require("../models/Organization");
+const userRoles = require("../../utils/userRoles");
+const OrganizationAdmin = require("../../models/organizationAdmin");
+const Organization = require("../../models/Organization");
 
 const authenticateToken = asyncHandler(async (req, res, next) => {
   console.log("Authenticating token");
