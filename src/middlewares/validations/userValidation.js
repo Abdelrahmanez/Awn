@@ -32,7 +32,16 @@ const registerValidation = () => {
     body("birthDate")
       .optional()
       .isDate()
-      .withMessage("Please enter a valid date"),
+      .withMessage("Please enter a valid date , format: YYYY-MM-DD"),
+    body("skills").optional().isArray().withMessage("Skills must be an array"),
+    body("isScorePrivate")
+      .optional()
+      .isBoolean()
+      .withMessage("Invalid value must be a boolean"),
+    body("gender")
+      .optional()
+      .isIn(["male", "female"])
+      .withMessage("Gender must be Male or Female"),
   ];
 };
 
@@ -91,12 +100,16 @@ const patchUserValidation = () => {
     body("birthDate")
       .optional()
       .isDate()
-      .withMessage("Please enter a valid date of birth"),
+      .withMessage("Please enter a valid date"),
     body("skills").optional().isArray().withMessage("Skills must be an array"),
     body("isScorePrivate")
       .optional()
       .isBoolean()
       .withMessage("Invalid value must be a boolean"),
+    body("gender")
+      .optional()
+      .isIn(["male", "female"])
+      .withMessage("Gender must be Male or Female"),
   ];
 };
 

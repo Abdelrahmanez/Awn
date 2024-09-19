@@ -60,6 +60,11 @@ const { organization } = require("../utils/userRoles");
 const Problem = require("../models/problem");
 const organizationService = require("../services/organizationService");
 const { renameImageFile } = require("../utils/imageHelper");
+const processImage = require("../utils/compressImage");
+const {
+  isProblemClosed,
+  isVolunteeringProblem,
+} = require("../utils/problemUtils");
 
 exports.registerUserController = asyncHandler(async (req, res) => {
   console.log(req.file);
@@ -72,6 +77,7 @@ exports.registerUserController = asyncHandler(async (req, res) => {
     address,
     birthDate,
     skills,
+    gender,
   } = req.body;
   const hashedPassword = await bcrypt.hash(password, hash);
 
@@ -87,19 +93,34 @@ exports.registerUserController = asyncHandler(async (req, res) => {
     address,
     birthDate,
     skills,
+    gender,
   });
 
   // Rename the profile image file to match the user's id
-  const profileImage = renameImageFile(req.file, user._id);
-  if (profileImage) {
-    user.profileImage = profileImage;
+  if (req.file) {
+    try {
+      const profileImagePath = await processImage(
+        req.file,
+        user._id,
+        "profile"
+      );
+      user.profileImage = profileImagePath;
+      await user.save();
+    } catch (error) {
+      console.error("Error processing image:", error);
+      return res.status(500).jsend.fail("Error processing image");
+    }
+  } else {
+    return res.status(400).jsend.fail("Logo is required");
   }
 
-  user.save();
-  return res.jsend.success({ user });
+  res.status(201).jsend.success({
+    user,
+  });
 });
 
 exports.loginUserController = asyncHandler(async (req, res) => {
+  console.log("loginUserController");
   const { emailOrUsername, password } = req.body;
 
   const lowercaseEmailOrUsername = emailOrUsername.toLowerCase();
@@ -124,33 +145,21 @@ exports.loginUserController = asyncHandler(async (req, res) => {
 });
 
 exports.volunteerController = asyncHandler(async (req, res) => {
-  const { problemId } = req.params;
-  const { joinedDays, branchId } = req.body;
+  const { problem } = req; // Problem is injected by middleware
+  const { joinedDays, branchId, activityId } = req.body;
   const userId = req.user._id;
 
-  const problem = await Problem.findById(problemId);
-  if (!problem) {
-    return res.status(404).jsend.fail({ message: "Problem not found" });
-  }
-  if (problem.status == "closed" || problem.terminated) {
-    return res.status(400).jsend.fail({
-      message: "Problem is not active. Cannot volunteer",
-    });
-  }
-  if (problem.problemType !== "volunteering") {
-    return res.status(400).jsend.fail({
-      message: "Problem is not a volunteering problem",
-    });
-  }
+  // Check if the problem is volunteering and active
 
-  // Create the new user
+  // Create the new volunteer record
   const volunteer = await Volunteerings.create({
-    problemId,
+    problemId: problem._id,
     userId,
     branchId,
     joinedDays,
+    activityId,
   });
-  volunteer.save();
+
   return res.jsend.success({ volunteer });
 });
 
@@ -171,12 +180,6 @@ exports.getProfile = async (req, res) => {
 };
 
 exports.updateUserController = asyncHandler(async (req, res) => {
-  // Ensure that the request contains valid data
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).jsend.fail({ errors: errors.array() });
-  }
-
   const {
     fullName,
     email,
@@ -187,6 +190,7 @@ exports.updateUserController = asyncHandler(async (req, res) => {
     birthDate,
     skills,
     isScorePrivate,
+    gender,
   } = req.body;
 
   // Check if password and password confirmation match
@@ -215,6 +219,7 @@ exports.updateUserController = asyncHandler(async (req, res) => {
   if (birthDate) user.birthDate = birthDate;
   if (skills) user.skills = skills;
   if (isScorePrivate !== undefined) user.isScorePrivate = isScorePrivate;
+  if (gender) user.gender = gender;
 
   // Update password if provided
   if (password) {
@@ -337,11 +342,18 @@ exports.getProblems = asyncHandler(async (req, res) => {
     date,
     problemType,
   });
-  if (!problems) {
+  if (!problems || problems.length === 0) {
     return res.status(404).jsend.fail({ message: "No problems found" });
   }
 
-  return res.status(200).jsend.success({ problems });
+  const formattedProblems = problems.map((problem) => ({
+    ...problem.toObject(), // Convert Mongoose document to plain object
+    organization: {
+      name: problem.organizationId.name,
+      ID: problem.organizationId._id,
+    },
+  }));
+  return res.status(200).jsend.success({ problems: formattedProblems });
 });
 
 exports.getProblemById = asyncHandler(async (req, res) => {

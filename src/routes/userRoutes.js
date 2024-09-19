@@ -2,9 +2,6 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user.controller");
-const {
-  registerOrganizationController,
-} = require("../controllers/organization.controllers");
 const checkUserExists = require("../middlewares/validations/checkUserExists");
 const userValidation = require("../middlewares/validations/userValidation");
 const loginValidation = require("../middlewares/validations/loginValidation");
@@ -12,16 +9,18 @@ const auth = require("../middlewares/auth/authentication");
 const authentication = require("../middlewares/auth/authentication");
 const authorise = require("../middlewares/auth/authorise");
 const userRoles = require("../utils/userRoles");
-const volnuteerValidation = require("../middlewares/validations/volnuteerValidation");
+const volunteerValidation = require("../middlewares/validations/volnuteerValidation");
 const validation = require("../middlewares/validations/validationResult");
 const isMongoObjectId = require("../middlewares/validations/isMongoObjectId");
-
 const upload = require("../middlewares/profileMulterConfig");
 const {
   addProblemValidation,
   updateProblemValidation,
   problemQueriesValidation,
 } = require("../middlewares/validations/ProblemValidation");
+const {
+  validateVolunteerToProblem,
+} = require("../middlewares/validations/problem/validateVolunteerToProblem");
 
 // GET / - prints hello world
 router.get("/", auth, userController.sendHello);
@@ -61,6 +60,7 @@ router
     authentication,
     authorise(userRoles.user),
     userValidation.patchUserValidation(),
+    validation, 
     userController.updateUserController
   );
 
@@ -77,8 +77,9 @@ router.post(
   "/problem/:problemId/volunteer",
   authentication,
   authorise(userRoles.user),
-  volnuteerValidation(),
+  volunteerValidation(),
   validation,
+  validateVolunteerToProblem,
   userController.volunteerController
 );
 

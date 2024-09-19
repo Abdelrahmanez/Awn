@@ -1,5 +1,6 @@
 const { date } = require("joi");
 const moongose = require("mongoose");
+const branch = require("./branch");
 
 const volunteeringsSchema = new moongose.Schema({
   userId: {
@@ -7,11 +8,6 @@ const volunteeringsSchema = new moongose.Schema({
     ref: "User",
     required: true,
   },
-  // organizationId: {
-  //   type: moongose.Schema.Types.ObjectId,
-  //   ref: "Organization",
-  //   required: true,
-  // },
   problemId: {
     type: moongose.Schema.Types.ObjectId,
     ref: "Problem",
@@ -20,6 +16,11 @@ const volunteeringsSchema = new moongose.Schema({
   branchId: {
     type: moongose.Schema.Types.ObjectId,
     ref: "Organization.branches",
+    required: true,
+  },
+  activityId: {
+    type: moongose.Schema.Types.ObjectId,
+    ref: "Problem.volunteeringDetails.activities",
     required: true,
   },
   joinedDays: [
@@ -33,8 +34,12 @@ const volunteeringsSchema = new moongose.Schema({
   ],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-  updatedBy: { type: moongose.Schema.Types.ObjectId, ref: "User" },
   deletedAt: { type: Date, default: null },
+});
+
+volunteeringsSchema.pre("save", function (next) {
+  this.updatedAt = Date.now();
+  next();
 });
 
 const VolunteeringHistory = moongose.model(

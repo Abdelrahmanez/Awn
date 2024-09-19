@@ -1,26 +1,22 @@
-
-module.exports = (...roles) => {
-
+module.exports = (...allowedRoles) => {
   return async (req, res, next) => {
     if (!req.user) {
       return res.status(401).jsend.fail({ message: "User not authenticated" });
     }
 
-    if (req.user.role === "admin" ) {
-      const permissions = req.user.permissions;
+    // Check if the user's role is in the allowedRoles
+    if (req.user.role === "admin") {
+      // Admins can have specific permissions, check them if needed
+      const permissions = req.user.permissions || [];
+      const hasPermission = allowedRoles.some(role => permissions.includes(role));
 
-      // Check if any of the roles are included in the permissions array
-      const hasPermission = roles.some(role => permissions.includes(role));
-      
       if (!hasPermission) {
-        return res
-          .status(403)
-          .jsend.fail({ message: "The user is not authorized" });
+        return res.status(403).jsend.fail({ message: "The user does not have the required permissions" });
       }
-    } else if (!roles.includes(req.user.role)) {
-      return res
-        .status(403)
-        .jsend.fail({ message: "The user is not authorized" });
+    } else if (!allowedRoles.includes(req.user.role)) {
+      console.log(req.user.role);
+      console.log(allowedRoles);
+      return res.status(403).jsend.fail({ message: "The user does not have the required role" });
     }
 
     next();

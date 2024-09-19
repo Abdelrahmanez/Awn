@@ -64,6 +64,7 @@ const OrganizationSchema = new mongoose.Schema({
   },
   logo: {
     type: String,
+    default: "",
   },
   socialMedia: {
     facebook: { type: String },
@@ -74,6 +75,11 @@ const OrganizationSchema = new mongoose.Schema({
   tokens: [{ token: String, blocked: { type: Boolean, default: false } }],
   deletedAt: {
     type: Date,
+    default: null,
+  },
+  mainBranch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Branch",
     default: null,
   },
 });

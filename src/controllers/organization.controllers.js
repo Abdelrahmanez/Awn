@@ -12,13 +12,11 @@ const { validationResult } = require("express-validator");
 const Problem = require("../models/problem");
 const OrganizationAdmin = require("../models/organizationAdmin");
 const Branch = require("../models/branch");
+const { renameOrganizationLogo } = require("../utils/imageHelper");
+const saveAndCompressFile = require("../utils/compressImage");
+const processImage = require("../utils/compressImage");
 
 exports.registerOrganizationController = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.jsend.fail(errors.array());
-  }
-
   const {
     name,
     description,
@@ -29,13 +27,11 @@ exports.registerOrganizationController = asyncHandler(async (req, res) => {
     contactEmails,
     paymentDetails,
     website,
-    logo,
     socialMedia,
   } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, hash);
 
-  // Create the new user
   const organization = await Organization.create({
     name,
     description,
@@ -46,15 +42,74 @@ exports.registerOrganizationController = asyncHandler(async (req, res) => {
     contactEmails,
     paymentDetails,
     website,
-    logo,
     socialMedia,
   });
-  organization.save();
-  res.status(201).json({
-    message: "organization created successfully",
-    organization: organization,
+
+  if (req.file) {
+    try {
+      const logoPath = await processImage(req.file, organization._id, "logo");
+      organization.logo = logoPath;
+      await organization.save();
+    } catch (error) {
+      console.error("Error processing image:", error);
+      return res.status(500).jsend.fail("Error processing image");
+    }
+  } else {
+    return res.status(400).jsend.fail("Logo is required");
+  }
+
+  res.status(201).jsend.success({
+    organization,
   });
-  return organization;
+});
+
+exports.updateOrganizationController = asyncHandler(async (req, res) => {
+  const organizationId = req.user.organizationId;
+
+  const {
+    name,
+    description,
+    slogan,
+    contactPhoneNumbers,
+    contactEmails,
+    paymentDetails,
+    website,
+    socialMedia,
+    mainBranch,
+  } = req.body;
+
+  const organization = await Organization.findById(organizationId);
+
+  if (!organization) {
+    return res.status(404).jsend.fail("Organization not found");
+  }
+
+  organization.name = name || organization.name;
+  organization.description = description || organization.description;
+  organization.slogan = slogan || organization.slogan;
+  organization.contactPhoneNumbers =
+    contactPhoneNumbers || organization.contactPhoneNumbers;
+  organization.contactEmails = contactEmails || organization.contactEmails;
+  organization.paymentDetails = paymentDetails || organization.paymentDetails;
+  organization.website = website || organization.website;
+  organization.socialMedia = socialMedia || organization.socialMedia;
+  organization.mainBranch = mainBranch || organization.mainBranch;
+
+  if (req.file) {
+    try {
+      const logoPath = await processImage(req.file, organization._id, "logo");
+      organization.logo = logoPath;
+    } catch (error) {
+      console.error("Error processing image:", error);
+      return res.status(500).jsend.fail("Error processing image");
+    }
+  }
+
+  await organization.save();
+
+  res.status(200).jsend.success({
+    organization,
+  });
 });
 
 exports.loginOrganizationController = asyncHandler(async (req, res) => {

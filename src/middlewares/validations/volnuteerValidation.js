@@ -9,6 +9,9 @@ const volunteerValidation = () => {
     body("branchId")
       .isMongoId()
       .withMessage("Branch ID must be a valid mongo ID"),
+    body("activityId")
+      .isMongoId()
+      .withMessage("Activity ID must be a valid mongo ID"),
     body("joinedDays").isArray().withMessage("Joined days must be an array"),
     body("joinedDays.*.dateId")
       .isMongoId()

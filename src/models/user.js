@@ -45,6 +45,11 @@ const userSchema = new Schema({
   tokens: [{ token: String, blocked: { type: Boolean, default: false } }],
   isActive: { type: Boolean, default: true },
   deletedAt: { type: Date, default: null },
+  gender: {
+    type: String,
+    enum: ["Male", "Female" , "not specified"],
+    default: "not specified",
+  },
 });
 
 const User = mongoose.model("User", userSchema);

@@ -6,6 +6,7 @@ const branchSchema = new mongoose.Schema({
     ref: "Organization",
     required: true,
   },
+  logo: { type: String, required: true },
   name: { type: String, required: true },
   address: {
     street: { type: String },

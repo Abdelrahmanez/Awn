@@ -141,13 +141,15 @@ exports.getAllProblems = async ({
       query["volunteeringDetails.branches"] = { $in: branchIds };
     }
 
-    const problems = await Problem.find(query);
+    const problems = await Problem.find(query).populate({
+      path: "organizationId",
+      select: "name logo",
+    });
     return problems;
   } catch (error) {
     throw error;
   }
 };
-
 
 exports.getOrganizationBranches = async ({ organizationId }) => {
   const branches = await Branch.find({

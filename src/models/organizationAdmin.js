@@ -1,4 +1,5 @@
 const moongose = require("mongoose");
+const branch = require("./branch");
 
 const organizationAdminSchema = new moongose.Schema({
   userId: { type: moongose.Schema.Types.ObjectId, ref: "User" },
@@ -13,6 +14,12 @@ const organizationAdminSchema = new moongose.Schema({
         "manage_branches",
       ],
       default: "manage_volunteers",
+    },
+  ],
+  branches: [
+    {
+      type: moongose.Schema.Types.ObjectId,
+      ref: "Organization.branches",
     },
   ],
   createdAt: { type: Date, default: Date.now },
