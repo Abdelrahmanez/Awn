@@ -60,7 +60,7 @@ router
     authentication,
     authorise(userRoles.user),
     userValidation.patchUserValidation(),
-    validation, 
+    validation,
     userController.updateUserController
   );
 
@@ -108,6 +108,13 @@ router.get(
   problemQueriesValidation(),
   validation,
   userController.getProblems
+);
+
+router.get(
+  "/randomProblems",
+  problemQueriesValidation(),
+  validation,
+  userController.getRandomProblems
 );
 
 // get problem by id which is not deleted and terminated and not completed (open or in progress)

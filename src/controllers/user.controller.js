@@ -310,6 +310,46 @@ exports.getAllOrganizations = asyncHandler(async (req, res) => {
   return res.status(200).jsend.success({ organizations });
 });
 
+exports.getRandomProblems = asyncHandler(async (req, res) => {
+  const problemType = req.query.problemType ? req.query.problemType : "both";
+
+  // Initialize the query object
+  const query = {};
+
+  // If problemType is provided, split and trim it, then apply it to the query
+  if (problemType) {
+    const problemTypeArray = problemType.split(",").map((type) => type.trim());
+    query.problemType = { $in: problemTypeArray };
+  }
+
+  // Perform the aggregation and include the organization details
+  const problems = await Problem.aggregate([
+    { $match: query }, // Match the problems by type
+    { $sample: { size: 15 } }, // Randomly select 15 problems
+    {
+      $lookup: {
+        from: "organizations", // The collection to join
+        localField: "organizationId", // Field in the problems
+        foreignField: "_id", // Field in the organizations
+        as: "organizationInfo", // Output array field
+      },
+    },
+    { $unwind: "$organizationInfo" }, // Unwind the organizationInfo array
+  ]);
+
+  // Map over the problems to format the organization data and attach it
+  const formattedProblems = problems.map((problem) => ({
+    ...problem, // Copy all problem fields
+    organization: {
+      name: problem.organizationInfo.name,
+      ID: problem.organizationInfo._id,
+    },
+  }));
+
+  // Return the response using JSend
+  return res.status(200).jsend.success({ problems: formattedProblems });
+});
+
 // get all problems for a specific organization which are not deleted and not terminated
 exports.getOrganizationProblems = asyncHandler(async (req, res) => {
   const { organizationId } = req.params;

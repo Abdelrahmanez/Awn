@@ -12,11 +12,21 @@ const ensureDirectoryExistence = (filePath) => {
 
 // Function to save, compress, and rename image
 
+const findPath = (type) => {
+  if (type === "profile") {
+    return "../uploads/profileImages";
+  } else if (type === "logo") {
+    return "../uploads/logos";
+  } else if (type === "problem") {
+    return "../uploads/problems";
+  }
+};
+
 // type is profile or logo or problem
 const processImage = async (file, Id, type) => {
-  const savePath =
-    type === "profile" ? "../uploads/profileImages" : "../uploads/logos";
-  const ext = path.extname(file.originalname);
+  const savePath = await findPath(type);
+  // const ext = path.extname(file.originalname);
+  const ext = ".png";
   const fileName = `${Id}${ext}`;
   const tempPath = path.join(__dirname, savePath, fileName);
 

@@ -8,6 +8,7 @@ const problemSchema = new mongoose.Schema({
     ref: "Organization", // Correctly references the Organization model
     required: true,
   },
+  image: { type: String, required: true, default: null },
   title: { type: String, required: true },
   description: { type: String, maxlength: 1000 },
   problemType: {

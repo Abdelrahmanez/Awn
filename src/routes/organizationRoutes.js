@@ -11,7 +11,6 @@ const authorise = require("../middlewares/auth/authorise");
 const userRoles = require("../utils/userRoles");
 const authentication = require("../middlewares/auth/authentication");
 const organizationControllers = require("../controllers/organization.controllers");
-const OrganizationAdmin = require("../models/organizationAdmin");
 const User = require("../models/user");
 const {
   registerValidation,
@@ -21,13 +20,14 @@ const loginValidation = require("../middlewares/validations/loginValidation");
 const addBranchValidation = require("../middlewares/validations/BranchValidation");
 const validation = require("../middlewares/validations/validationResult");
 const problem = require("../models/problem");
-const uploadOrganizationLogo = require("../middlewares/organizationMulterConfig");
+const multerUpload = require("../middlewares/multerConfig");
 const { branchesBelongsToOrganization } = require("../utils/organizationUtils");
+const OrganizationAdmin = require("../models/organizationAdmin");
 
 // POST / - add a new organization
 router.post(
   "/register",
-  uploadOrganizationLogo.single("logo"),
+  multerUpload.single("logo"),
   registerValidation(),
   validation,
   checkOrganizationExists,
@@ -51,6 +51,7 @@ router.patch(
 
 router.post(
   "/problem",
+  multerUpload.single("image"),
   ProblemValidation.addProblemValidation(),
   validation,
   authentication,
@@ -95,6 +96,16 @@ router.post(
 
       if (!user) {
         return res.status(404).jsend.fail({ message: "User not found" });
+      }
+
+      const existAdmin = await OrganizationAdmin.findOne({
+        userId,
+      });
+
+      if (existAdmin) {
+        return res.status(400).jsend.fail({
+          message: "User is already an admin of an organization",
+        });
       }
 
       // Create a new OrganizationAdmin document

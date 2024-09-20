@@ -150,6 +150,10 @@ exports.loginOrganizationController = asyncHandler(async (req, res) => {
 exports.addProblemController = asyncHandler(async (req, res) => {
   const organizationId = req.user.organizationId;
 
+  if (!req.file) {
+    return res.status(400).jsend.fail("Image is required");
+  }
+
   const {
     title,
     description,
@@ -182,8 +186,28 @@ exports.addProblemController = asyncHandler(async (req, res) => {
     problemData.volunteeringDetails = volunteeringDetails;
   }
 
+  // Set the image to an empty string
+  problemData.image = "aa";
+
+  console.log("Problem data:", problemData);
+
   // Create the problem with the appropriate details
   const problem = await Problem.create(problemData);
+
+  console.log("Problem created:", problem);
+
+  if (req.file) {
+    try {
+      const imagePath = await processImage(req.file, problem._id, "problem");
+      problem.image = imagePath; // Changed from logo to image
+      await problem.save();
+    } catch (error) {
+      console.error("Error processing image:", error);
+      return res.status(500).jsend.fail("Error processing image");
+    }
+  } else {
+    return res.status(400).jsend.fail("Image is required");
+  }
 
   res.status(201).jsend.success({
     message: "Problem created successfully",
