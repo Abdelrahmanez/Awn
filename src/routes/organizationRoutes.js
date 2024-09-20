@@ -23,7 +23,7 @@ const problem = require("../models/problem");
 const multerUpload = require("../middlewares/multerConfig");
 const { branchesBelongsToOrganization } = require("../utils/organizationUtils");
 const OrganizationAdmin = require("../models/organizationAdmin");
-
+const isMongoId = require("../middlewares/validations/isMongoObjectId");
 // POST / - add a new organization
 router.post(
   "/register",
@@ -127,6 +127,12 @@ router.post(
       res.status(500).jsend.error({ message: error.message });
     }
   }
+);
+
+router.get(
+  "/branch/:id",
+  isMongoId("id"),
+  organizationControllers.getBranch
 );
 
 module.exports = router;

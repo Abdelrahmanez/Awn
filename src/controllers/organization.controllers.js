@@ -15,6 +15,7 @@ const Branch = require("../models/branch");
 const { renameOrganizationLogo } = require("../utils/imageHelper");
 const saveAndCompressFile = require("../utils/compressImage");
 const processImage = require("../utils/compressImage");
+const mongoose = require("mongoose");
 
 exports.registerOrganizationController = asyncHandler(async (req, res) => {
   const {
@@ -237,4 +238,23 @@ exports.addBranchController = asyncHandler(async (req, res) => {
   });
 
   return;
+});
+
+exports.getBranch = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // Validate the id
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).jsend.fail("Invalid branch ID");
+  }
+
+  const branch = await Branch.findById(id);
+
+  if (!branch) {
+    return res.status(404).jsend.fail("Branch not found");
+  }
+
+  res.status(200).jsend.success({
+    branch,
+  });
 });
