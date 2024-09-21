@@ -8,6 +8,7 @@ const Organization = require("../../models/Organization");
 
 const authenticateToken = asyncHandler(async (req, res, next) => {
   console.log("Authenticating token");
+  console.log(req.body);
 
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];

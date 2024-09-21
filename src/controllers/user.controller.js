@@ -149,8 +149,6 @@ exports.volunteerController = asyncHandler(async (req, res) => {
   const { joinedDays, branchId, activityId } = req.body;
   const userId = req.user._id;
 
-  // Check if the problem is volunteering and active
-
   // Create the new volunteer record
   const volunteer = await Volunteerings.create({
     problemId: problem._id,

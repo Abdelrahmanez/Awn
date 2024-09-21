@@ -108,7 +108,7 @@ const patchUserValidation = () => {
       .withMessage("Invalid value must be a boolean"),
     body("gender")
       .optional()
-      .isIn(["male", "female"])
+      .isIn(["Male", "Female" , "not specified"])
       .withMessage("Gender must be Male or Female"),
   ];
 };
