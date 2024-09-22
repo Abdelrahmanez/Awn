@@ -34,7 +34,7 @@ const userSchema = new Schema({
     street: { type: String },
     city: { type: String },
     state: { type: String },
-    country: { type: String },
+    country: { type: String, default: "Egypt" },
   },
   birthDate: { type: Date },
   skills: [String],
@@ -47,7 +47,7 @@ const userSchema = new Schema({
   deletedAt: { type: Date, default: null },
   gender: {
     type: String,
-    enum: ["Male", "Female" , "not specified"],
+    enum: ["Male", "Female", "not specified"],
     default: "not specified",
   },
 });

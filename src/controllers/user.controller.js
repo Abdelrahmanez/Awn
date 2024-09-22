@@ -67,6 +67,7 @@ const {
 } = require("../utils/problemUtils");
 
 exports.registerUserController = asyncHandler(async (req, res) => {
+  console.log(req.body);
   console.log(req.file);
   const {
     fullName,
