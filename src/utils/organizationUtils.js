@@ -1,4 +1,4 @@
-const Organization = require("../models/Organization");
+const Organization = require("../models/organization");
 const Branch = require("../models/branch");
 
 exports.branchesBelongsToOrganization = async (req, res, next) => {

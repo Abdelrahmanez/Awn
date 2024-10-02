@@ -1,6 +1,6 @@
 const User = require("../../models/user");
 const bcrypt = require("bcryptjs");
-const Organization = require("../../models/Organization");
+const Organization = require("../../models/organization");
 
 const passwordValidation = ({ password, passwordConfirmation }) => {
   if (password.length < 8) {

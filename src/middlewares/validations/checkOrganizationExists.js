@@ -1,11 +1,9 @@
-const Organization = require("../../models/Organization");
+const Organization = require("../../models/organization");
 const asyncHandler = require("express-async-handler");
 
 const checkOrganizationExists = asyncHandler(async (req, res, next) => {
   const { username } = req.body;
   console.log(username);
-
-  
 
   const organization = await Organization.findOne({
     username: username.toLowerCase(),
@@ -14,7 +12,9 @@ const checkOrganizationExists = asyncHandler(async (req, res, next) => {
   console.log(organization);
 
   if (organization) {
-    return res.status(400).jsend.fail("Organization already exists with this username");
+    return res
+      .status(400)
+      .jsend.fail("Organization already exists with this username");
   }
 
   next();
