@@ -1,4 +1,4 @@
-const Organization = require("../models/Organization");
+const Organization = require("../models/organization");
 const Problem = require("../models/problem");
 const mongoose = require("mongoose");
 const Branch = require("../models/branch");

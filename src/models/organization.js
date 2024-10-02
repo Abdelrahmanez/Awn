@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const userRoles = require("../utils/userRoles");
 
-const OrganizationSchema = new mongoose.Schema({
+const organizationSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -85,9 +85,10 @@ const OrganizationSchema = new mongoose.Schema({
 });
 
 // Middleware to update the `updatedAt` field before saving
-OrganizationSchema.pre("save", function (next) {
+organizationSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-module.exports = mongoose.model("Organization", OrganizationSchema);
+// Exporting the model, ensuring it's not re-compiled if already defined
+module.exports = mongoose.models.Organization || mongoose.model("Organization", organizationSchema);
