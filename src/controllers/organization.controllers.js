@@ -1,4 +1,4 @@
-const Organization = require("../models/Organization");
+const Organization = require("../models/organization");
 const bcrypt = require("bcryptjs");
 const hash = 10;
 const {
