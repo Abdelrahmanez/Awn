@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-dotenv.config({ path: "./config.env" });
+dotenv.config({ path: "../../config.env" });
 const isActiveAccount = require("./isActiveAccount");
 const userRoles = require("../../utils/userRoles");
 
